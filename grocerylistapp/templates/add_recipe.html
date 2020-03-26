@@ -1,0 +1,32 @@
+{% extends 'layout.html' %}
+{% block content %}
+
+<form method="POST" action="">
+    {{ form.hidden_tag() }}
+    <div class="form-group">
+        {{ form.name(class="form-control") }}
+    </div>
+    <div class="form-group">
+        {{ form.submit(class="btn btn-primary") }}
+    </div>
+</form>
+
+    <h4 id='hex-name'>{{ rlist.hex_name }}</h4>
+
+    <ul class="list-group">
+        {% for line in rlist_lines %}
+        <div class="list-group-item btn-group" id="{{ line.id_in_list }}">
+            {% for token, color in line.text_to_colors %}
+                <button class="{{ color }} word-button" >{{ token }}</button>
+            {% endfor %}
+        </div>
+        {% endfor %}
+    </ul>
+
+
+
+
+<script src="{{url_for('static', filename='clean-list.js')}}"></script>
+
+
+{% endblock content %}

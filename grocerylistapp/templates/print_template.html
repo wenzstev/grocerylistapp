@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+    <!-- Bootstrap Links -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+    <link rel="stylesheet" href="{{url_for('static', filename='main.css')}}">
+    <style>
+        li {
+            margin-bottom: 10px;
+            font-size: large;
+        }
+    </style>
+</head>
+
+<body>
+<h1>{{list.name}}</h1>
+
+<ul>
+    {% for line in lines %}
+        {% if print_checked == "n" %}
+            {% if not line.checked %}
+                <li>{{line.ingredient}}</li>
+            {% endif %}
+        {% else %}
+            <li>{{line.ingredient}}</li>
+                {% if print_lines == "y" %}
+                    <ul>
+                        {% for raw_line in line.raw_lines %}
+                            <li>{{raw_line.full_text}} <span style="font-style: italic">{{raw_line.recipe.name}}</span></li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+        {% endif %}
+    {% endfor %}
+</ul>
+{% if print_recipes=="y" %}
+    <h1> Recipes </h1>
+    <ul>
+        {% for recipe in list_recipes %}
+            <li>{{recipe.name}}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+</body>

@@ -1,0 +1,224 @@
+{% extends 'layout.html' %}
+
+{% block styles %}
+<style>
+
+</style>
+{% endblock styles %}
+
+{% block content %}
+    <div class="row">
+      <div class="col-sm-6">
+        <h1> Recipes </h1>
+          <div id="recipe-list" class="list-group">
+              {% for recipe in recipe_list %}
+                <div role="button" class="recipe-button list-group-item">
+                    <span class="dot hidden {{recipe.hex_color}}" style="background-color:{{recipe.hex_color}}"></span>
+                    {{recipe.name}}
+                    {% if recipe.recipe_url %}
+                        <a href={{recipe.recipe_url}} target="_blank" class="source-button well">Source</a>
+                    {% endif %}
+                </div>
+              {% endfor %}
+          </div>
+          <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addRecipeModal"> Add Recipe </button>
+      </div>
+
+      <div class="col-sm-6">
+          <div id="complist-name-div">
+              <h1 id="complist-name">{{ comp_list.name }}</h1>
+              <button id="rename-list-button" class="btn btn-secondary">Rename</button>
+          </div>
+          <div id="list-tool-panel">
+              <button data-toggle="modal" data-target="#printModal" class="btn btn-info">Print</button>
+              <button data-toggle="modal" data-target="#exportModal" class="btn btn-info">Email</button>
+          </div>
+            <div class="list-group list-group-root " id="compiled-list">
+                {% for line in list_lines %}
+                <div id="full-{{line.hex_id}}" class="full-line">
+                    <label id="label-{{line.hex_id}}" class="recipe-label">
+                        <input id="checkbox-{{line.hex_id}}" type="checkbox"{{line.checked}}>
+                        <span class="recipe-checkbox"></span>
+                    </label>
+                    <div id="line-{{line.hex_id}}" class="recipe-line">
+                    <a href="#{{line.ingredient_id}}" class="list-group-item recipe-list" data-toggle="collapse" aria-expanded="false" role="button">
+                        <button id=drag-{{line.hex_id}} class="drag-button">&#8801</button>
+                        <span class="ingredient-name">
+                            {% for dot in line.color_dots %}
+                            <span class="dot top-level hidden" style="background-color:{{dot}}"></span>
+                            {% endfor %}
+                            {{ line.ingredient }}
+                        </span>
+                        <button id="delete-{{line.hex_id}}" class="remove-button">&#10006</button>
+                    </a>
+                    {% if line.raw_lines %}
+                    <div class="list-group collapse" id="{{line.ingredient_id}}">
+                        {% for raw_line in line.raw_lines %}
+                            <div class="list-group-item list-flex" data-toggle="collapse" id="{{raw_line.recipe.hex_name}}-{{raw_line.id_in_list}}">
+                                <div class="recipe-info">
+                                    <span class="dot" style="background-color:{{raw_line.recipe.hex_color}}"></span>
+                                    <div class="recipe-div">"{{raw_line.full_text}}"</div>
+                                    <div class="recipe-name recipe-div">{{raw_line.recipe.name}}</div>
+                                </div>
+                                <div class="button-panel recipe-div">
+                                    <button class="edit-button">Edit</button>
+                                </div>
+                            </div>
+                        {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <input id="add-line-input" class="form-control" type="text">
+            <button id="add-line-submit" class="btn btn-secondary"> Add Line </button>
+
+            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteModal"> Delete </button>
+      </div>
+    </div>
+
+
+<!-- Modal Delete -->
+<div class="modal fade" tabindex="-1" id="deleteModal" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h5 class="modal-title" id="deleteModalLabel">Delete List?</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">x</span>
+                  </button>
+              </div>
+              <div class="modal-body">
+                  <p>Are you sure you want to delete this list? All data saved for it will be lost.</p>
+              </div>
+              <div class="modal-footer">
+                  <div class="containter-fluid">
+                      <div class="pull-left">
+                          <form class =col-md-4" action="{{ url_for('checklist.delete', hex_name=comp_list.hex_name) }}" method="POST">
+                              <input class="btn btn-danger" type="submit" value="Delete">
+                          </form>
+                      </div>
+                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                  </div>
+              </div>
+          </div>
+      </div>
+</div>
+
+<!-- Modal Add Recipe -->
+<div class="modal fade" tabindex="-1" id="addRecipeModal" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addRecipeModalLabel">Add New Recipe</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">x</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Enter the URL of the recipe you would like to add: </p>
+                <form method="POST" action="">
+                    {{ recipe_form.hidden_tag() }}
+                    <fieldset>
+                        <div class="form-group">
+                            {{ recipe_form.url.label(class="form-control-label") }}
+                            {{ recipe_form.url(class="form-control") }}
+                        </div>
+                    </fieldset>
+                    <div class="form-group">
+                        {{ recipe_form.submit(class="btn btn-primary") }}
+                        <button type="button" class="btn btn-secondary col-md-4" data-dismiss="modal">Close</button>
+                    </div>
+                </form>
+                <p>Or paste/type the Recipe Ingredients below:</p>
+                <form method="POST" action="">
+                    {{ custom_recipe_form.hidden_tag() }}
+                    <div class="form-group">
+                        {{ custom_recipe_form.recipe_lines(class="form-control") }}
+                    </div>
+                    <div class="form-group">
+                        {{ custom_recipe_form.submit(class="btn btn-primary") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Print -->
+<div class="modal fade" tabindex="-1" id="printModal" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="printModalLabel">Print List</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">x</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" target="_blank" action="{{ url_for('checklist.print_list', hex_name=comp_list.hex_name) }}">
+                    {{export_to_pdf_form.hidden_tag()}}
+                    <fieldset>
+                        <div>
+                        {{export_to_pdf_form.show_checked.label}}
+                        {{export_to_pdf_form.show_checked(class="form-check")}}
+                        </div>
+                        <div>
+                        {{export_to_pdf_form.show_recipes.label}}
+                        {{export_to_pdf_form.show_recipes(class="form-check")}}
+                        </div>
+                         <div>
+                        {{export_to_pdf_form.show_lines.label}}
+                        {{export_to_pdf_form.show_lines(class="form-check")}}
+                        </div>
+                    </fieldset>
+                    {{export_to_pdf_form.submit(class="btn btn-submit")}}
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Email -->
+<div class="modal fade" tabindex="-1" id="exportModal" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exportModalLabel">Export List</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">x</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="">
+                    {{export_to_email_form.hidden_tag()}}
+                    <fieldset>
+                        {{export_to_email_form.email.label}}
+                        {{export_to_email_form.email(class='form-control')}}
+                    </fieldset>
+                    {{export_to_email_form.submit(class='btn btn-primary')}}
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+  $(document).ready(function () {
+    $('#sidebarCollapse').on('click', function(){
+      console.log('here');
+      $('#sidebar').toggleClass('active');
+    });
+  });
+</script>
+
+<script src="{{url_for('static', filename='list-functions.js')}}"></script>
+<script>
+    $LIST_HEX = "{{ comp_list.hex_name }}"
+
+</script>
+
+{% endblock content %}
