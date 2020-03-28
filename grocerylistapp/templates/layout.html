@@ -32,6 +32,12 @@
                 <span class="icon-bar"></span>
             </button>
             <a class="navbar-brand" href="{{ url_for('main.home') }}">Home</a>
+            {% if current_user.is_authenticated %}
+                <span class="navbar-text navbar-username">Welcome, {{current_user.username}}</span>
+            {% else %}
+                <a class="navbar-brand" href="{{ url_for('account.register') }}">Register</a>
+                <a class="navbar-brand" href="{{ url_for('account.login') }}">Login</a>
+            {% endif %}
         </div>
         <div class="collapse navbar-collapse" id="myNavbar">
             <ul class="nav navbar-nav">
@@ -45,6 +51,9 @@
                             {% endfor %}
                         </ul>
                     </li>
+                {% endif %}
+                {% if current_user.is_authenticated %}
+                    <li><a href="{{ url_for('account.logout') }}">Logout</a></li>
                 {% endif %}
             </ul>
         </div>

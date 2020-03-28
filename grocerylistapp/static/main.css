@@ -282,6 +282,26 @@ a[data-toggle="collapse"] {
   color: white;
 }
 
+.centered-form {
+  max-width: 500px;
+  margin: auto;
+}
+
+.navbar-username {
+  float: right;
+  margin-right: 15px;
+}
+
+.navbar-logout {
+  font-size: 12px;
+  margin-top: 16px;
+}
+
+.invalid-feedback {
+  color: red;
+  font-style: italic;
+}
+
 #list-tool-panel{
   padding-bottom: 10px;
 }
