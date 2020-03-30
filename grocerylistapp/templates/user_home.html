@@ -1,0 +1,39 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<h1>Your Lists</h1>
+
+
+{% for list in user_lists %}
+<div class="card recipe-card">
+    <div class="card-body">
+        <h5><a href="{{url_for('checklist.compiled_list', hex_name=list.hex_name)}}" class="stretched-link card-title">{{list.name}}</a></h5>
+        {% for recipe in list.sample_recipes %}
+            <h6 class="card-subtitle mb-2 text-muted">{{ recipe.name }}</h6>
+        {% endfor %}
+        {% if list.leftover_recipes > 0 %}
+            <p class="card-text font-italic text-muted">...and {{list.leftover_recipes}} more. </p>
+        {% endif %}
+    </div>
+</div>
+{% else %}
+<h3>You haven't made any lists yet.</h3>
+<div class="card">
+    <div class="card-body">
+        <form method="POST" action="{{url_for('checklist.create', method='url')}}">
+            {{ url_form.hidden_tag() }}
+            <div class="form-row">
+                <div class="col">
+                {{ url_form.url(class="form-control", placeholder=url_form.url.label.text) }}
+                </div>
+                <div class="col">
+                {{ url_form.submit(class="btn btn-primary") }}
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endfor %}
+
+
+{% endblock content %}

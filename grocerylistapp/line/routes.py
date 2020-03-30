@@ -15,6 +15,7 @@ line = Blueprint('line', __name__)
 def get_colors():
     # check if finding by line id or recipe hex
     line_id = request.form.get('line_id', -1, int)
+    print(line_id)
     if line_id > 0:  # if we have a line id
         cur_line = RawLine.query.filter_by(line_id).first_or_404()
     else:  # we're finding it from a recipe hex

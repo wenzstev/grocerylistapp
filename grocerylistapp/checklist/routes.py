@@ -1,6 +1,7 @@
 import json, pdfkit
 
 from flask import Blueprint, redirect, url_for, flash, render_template, request, jsonify, make_response, abort
+from flask_login import current_user
 
 from grocerylistapp import db
 from grocerylistapp.models import CompiledList, CleanedLine, RecipeList, RawLine
@@ -28,19 +29,19 @@ def compiled_list(hex_name):
 
     if recipe_form.validate_on_submit():
         new_recipe = create_recipe_from_url(recipe_form.url.data)
-        return redirect(url_for('main.add_recipe', list_name=hex_name, new_recipe=new_recipe.hex_name))
+        return redirect(url_for('recipe.clean_recipe', list_name=hex_name, new_recipe=new_recipe.hex_name))
 
     if custom_recipe_form.validate_on_submit():
         new_recipe = create_recipe_from_text("Untitled Recipe", custom_recipe_form.recipe_lines.data)
         new_recipe.complist = comp_list
 
-        return redirect(url_for('main.add_recipe', list_name=comp_list.hex_name, new_recipe=new_recipe.hex_name))
+        return redirect(url_for('recipe.clean_recipe', list_name=comp_list.hex_name, new_recipe=new_recipe.hex_name))
 
     if export_to_email_form.validate_on_submit():
         email_list(export_to_email_form.email.data, comp_list, list_lines, recipe_list)
         flash('Email sent successfully!', 'success')
 
-        return redirect(url_for('main.compiled_list', hex_name=hex_name))
+        return redirect(url_for('list.compiled_list', hex_name=hex_name))
 
 
     list_lines = [CompiledIngredientLine(line) for line in list_lines]
@@ -49,7 +50,7 @@ def compiled_list(hex_name):
     # reverse to put "additional ingredients" on bottom
     recipe_list.reverse()
 
-    grocery_lists = CompiledList.query.all()
+    grocery_lists = CompiledList.query.filter_by(user_id=current_user.id)
 
     return render_template('list_page.html', grocery_lists=grocery_lists, comp_list=comp_list,
                            list_lines=list_lines, recipe_form=recipe_form,
@@ -59,7 +60,7 @@ def compiled_list(hex_name):
 
 @checklist.route('/list/create/<string:method>', methods=['POST'])
 def create(method):
-    new_list = create_list()
+    new_list = create_list(current_user.id)
 
     # figure out how the list was created
     print(request.form)

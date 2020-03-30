@@ -30,6 +30,7 @@ class CompiledList(db.Model):
     hex_name = db.Column(db.String(20), unique=True, nullable=False)  # name for database #TODO use hex_id() function
     lines = db.relationship('CleanedLine', backref='list', lazy=True)  # cleaned lines for the list
     recipes = db.relationship('RecipeList', backref='complist', lazy=True)  # all recipes that are in the compiled list
+    user_id = db.Column(db.ForeignKey('user.id'), nullable=False)  # the id of the user who made the list
 
     def __repr__(self):
         return f"{self.name}"
@@ -71,6 +72,7 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(20), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(60), nullable=False)
+    checklists = db.relationship('CompiledList', backref='user', lazy=True)  # the user's grocery lists
 
     def __repr__(self):
         return f"(User('{self.username}', '{self.email}'"

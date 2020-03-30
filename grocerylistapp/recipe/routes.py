@@ -1,4 +1,5 @@
 from flask import Blueprint, redirect, url_for, render_template, request, flash
+from flask_login import current_user
 
 from grocerylistapp import db
 
@@ -86,7 +87,6 @@ def clean_recipe(list_name, new_recipe):
 
     rlist_lines = [LineToPass(line) for line in rlist_lines]
 
-    for line in rlist_lines:
-        print(line.text_to_colors)
+    grocery_list = CompiledList.query.filter_by(user_id=current_user.id)
 
     return render_template('add_recipe.html', title="Adding Recipe", rlist=rlist, rlist_lines=rlist_lines, form=form)

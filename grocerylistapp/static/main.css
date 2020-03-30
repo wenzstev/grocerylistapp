@@ -152,6 +152,7 @@ a[data-toggle="collapse"] {
   border: none;
   border-radius: 50%;
   right: 30px;
+  bottom: 5px;
   color: indianred;
   font-weight: bold;
   outline: none;
@@ -168,8 +169,8 @@ a[data-toggle="collapse"] {
   outline: none;
   background-color: transparent;
   position: relative;
-  right: 8px;
-  bottom: 8px;
+  right: 10px;
+  bottom: 12px;
   font-size: x-large;
   z-index: 1;
 }
@@ -180,7 +181,7 @@ a[data-toggle="collapse"] {
 
 .ingredient-name {
   position: relative;
-  bottom: 10px;
+  bottom: 15px;
   right: 5px;
 }
 
@@ -304,4 +305,17 @@ a[data-toggle="collapse"] {
 
 #list-tool-panel{
   padding-bottom: 10px;
+}
+
+.recipe-card:hover{
+  background-color: whitesmoke;
+}
+
+.recipe-card .card-title{
+  color: black;
+}
+
+.recipe-card .card-title:hover{
+  color: dimgrey;
+  text-decoration: none;
 }

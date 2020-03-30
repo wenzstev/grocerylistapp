@@ -13,7 +13,7 @@
           <div id="recipe-list" class="list-group">
               {% for recipe in recipe_list %}
                 <div role="button" class="recipe-button list-group-item">
-                    <span class="dot hidden {{recipe.hex_color}}" style="background-color:{{recipe.hex_color}}"></span>
+                    <span class="dot d-none {{recipe.hex_color}}" style="background-color:{{recipe.hex_color}}"></span>
                     {{recipe.name}}
                     {% if recipe.recipe_url %}
                         <a href={{recipe.recipe_url}} target="_blank" class="source-button well">Source</a>
@@ -41,15 +41,15 @@
                         <span class="recipe-checkbox"></span>
                     </label>
                     <div id="line-{{line.hex_id}}" class="recipe-line">
-                    <a href="#{{line.ingredient_id}}" class="list-group-item recipe-list" data-toggle="collapse" aria-expanded="false" role="button">
+                    <a href="#{{line.ingredient_id}}" class="list-group-item list-group-item-action recipe-list" data-toggle="collapse" aria-expanded="false" role="button">
                         <button id=drag-{{line.hex_id}} class="drag-button">&#8801</button>
                         <span class="ingredient-name">
                             {% for dot in line.color_dots %}
-                            <span class="dot top-level hidden" style="background-color:{{dot}}"></span>
+                            <span class="dot top-level d-none" style="background-color:{{dot}}"></span>
                             {% endfor %}
                             {{ line.ingredient }}
                         </span>
-                        <button id="delete-{{line.hex_id}}" class="remove-button">&#10006</button>
+                        <button id="delete-{{line.hex_id}}" class="remove-button">&#10005</button>
                     </a>
                     {% if line.raw_lines %}
                     <div class="list-group collapse" id="{{line.ingredient_id}}">
@@ -206,19 +206,13 @@
 </div>
 
 
-<script type="text/javascript">
-  $(document).ready(function () {
-    $('#sidebarCollapse').on('click', function(){
-      console.log('here');
-      $('#sidebar').toggleClass('active');
-    });
-  });
-</script>
-
-<script src="{{url_for('static', filename='list-functions.js')}}"></script>
 <script>
     $LIST_HEX = "{{ comp_list.hex_name }}"
 
 </script>
 
 {% endblock content %}
+
+{% block scripts %}
+<script src="{{url_for('static', filename='list-functions.js')}}"></script>
+{% endblock scripts %}

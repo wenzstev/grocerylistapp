@@ -44,6 +44,22 @@ class CompiledIngredientLine:
                 self.color_dots.add(recipe.hex_color)
 
 
+class ChecklistCard:
+    def __init__(self, checklist, num_samples):
+        self.name = checklist.name
+        self.hex_name = checklist.hex_name
+        self.lines = CleanedLine.query.filter_by(list=checklist).all()
+        self.recipes = RecipeList.query.filter(RecipeList.complist == checklist,
+                                               RecipeList.name != "Additional Ingredients").all()
+
+        self.sample_lines = self.lines[:num_samples]
+        self.sample_recipes = self.recipes[:num_samples]
+
+        self.leftover_recipes = len(self.recipes) - len(self.sample_recipes)
+
+
+
+
 # creates a new recipe
 def create_recipe(title):
     random_hex = secrets.token_urlsafe(8)

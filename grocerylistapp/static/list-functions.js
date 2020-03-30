@@ -74,14 +74,14 @@ $(document).ready(function(){
     if(!$( this ).hasClass("active")){
       var dot = $( this ).find("span")
       var color = dot.css("background-color")
-      dot.toggleClass("hidden")
+      dot.toggleClass("d-none")
 
       var dots_to_hide = $("#compiled-list").find("span").filter(function(){
         return ($( this ).css("background-color") === color
           &&
           $( this ).hasClass("top-level"))
       })
-      dots_to_hide.toggleClass("hidden")
+      dots_to_hide.toggleClass("d-none")
   }
 }
 
@@ -144,7 +144,7 @@ $(document).ready(function(){
 
     $.ajax({
       type: 'POST',
-      url: $SCRIPT_ROOT + '/list/get_colors',
+      url: $SCRIPT_ROOT + '/line/get_colors',
       data: data,
       dataType: 'json',
       success: function(jsonData){
