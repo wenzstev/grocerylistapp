@@ -59,7 +59,6 @@ class ChecklistCard:
 
 
 
-
 # creates a new recipe
 def create_recipe(title):
     random_hex = secrets.token_urlsafe(8)

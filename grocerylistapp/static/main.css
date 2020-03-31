@@ -307,6 +307,10 @@ a[data-toggle="collapse"] {
   padding-bottom: 10px;
 }
 
+.recipe-card{
+  min-height: 10rem;
+}
+
 .recipe-card:hover{
   background-color: whitesmoke;
 }

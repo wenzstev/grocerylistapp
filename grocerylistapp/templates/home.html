@@ -8,7 +8,7 @@
         <div class="panel-body">
             <p class="text-center">To get started, please paste the url of the recipe you would like to add:</p>
 
-            <form method="POST" action="{{url_for('checklist.create', method='url')}}">
+            <form method="POST" action="{{url_for('checklist.create_methods', method='url')}}">
                 {{ url_form.hidden_tag() }}
                 <fieldset>
                     <div class="form-group">
@@ -22,7 +22,7 @@
             </form>
 
             <p>Or, if you prefer, enter your recipe manually:</p>
-            <form method="POST" action="{{url_for('checklist.create', method='manual')}}">
+            <form method="POST" action="{{url_for('checklist.create_methods', method='manual')}}">
                 {{ custom_form.hidden_tag() }}
                 <div class="form-group">
                     {{ custom_form.recipe_lines(class="form-control") }}

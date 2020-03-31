@@ -58,8 +58,17 @@ def compiled_list(hex_name):
                            export_to_pdf_form=export_to_pdf_form, export_to_email_form=export_to_email_form)
 
 
-@checklist.route('/list/create/<string:method>', methods=['POST'])
-def create(method):
+@checklist.route('/list/create', methods=['GET', 'POST'])
+def create_list_page():
+    grocery_lists = CompiledList.query.filter_by(user_id=current_user.id).all()
+    url_form = RecipeURLForm(prefix='url')
+    custom_form = CustomRecipeForm(prefix='custom')
+
+    return render_template('create_list.html', grocery_lists=grocery_lists, url_form=url_form, custom_form=custom_form)
+
+
+@checklist.route('/list/create/<string:method>', methods=['GET', 'POST'])
+def create_methods(method):
     new_list = create_list(current_user.id)
 
     # figure out how the list was created

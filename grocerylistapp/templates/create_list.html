@@ -1,0 +1,37 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<h1 class="mt-3">Create new list</h1>
+<h6 class="text-muted font-italic">To get started, first paste the URL of a recipe you would like to add to your grocery list...</h6>
+<div class="card my-3">
+    <div class="card-body">
+        <h5>Create by URL</h5>
+        <form method="POST" action="{{url_for('checklist.create_methods', method='url')}}">
+            <fieldset>
+                {{url_form.url(class='form-control', placeholder='Paste your URL here...')}}
+            </fieldset>
+            {{url_form.submit(class='btn btn-primary mt-2')}}
+        </form>
+    </div>
+</div>
+<h6 class="text-muted font-italic">... or type or paste lines from a recipe or individual ingredients below! </h6>
+<div class="card my-3">
+    <div class="card-body">
+        <h5>Or create by typing or pasting recipe lines below:</h5>
+        <form method="POST" action="{{ url_for('checklist.create_methods', method='custom') }}">
+            <fieldset>
+                {{ custom_form.recipe_lines(class='form-control')}}
+            </fieldset>
+            {{ custom_form.submit(class='btn btn-primary mt-2') }}
+        </form>
+    </div>
+</div>
+<h6 class="text-muted font-italic">You can also create a blank list, and add recipes later.</h6>
+<div class="card recipe-card my-3">
+    <div class="card-body">
+        <h5><a class="card-title stretched-link" href="{{ url_for('checklist.create_methods', method='blank') }}">New List</a></h5>
+        <h6 class="card-subtitle mb-2 text-muted font-italic">You can add recipes later.</h6>
+    </div>
+</div>
+
+{% endblock content %}

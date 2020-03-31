@@ -8,7 +8,7 @@
 
 {% block content %}
     <div class="row">
-      <div class="col-sm-6">
+      <div class="col-md-6">
         <h1> Recipes </h1>
           <div id="recipe-list" class="list-group">
               {% for recipe in recipe_list %}
@@ -24,7 +24,7 @@
           <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addRecipeModal"> Add Recipe </button>
       </div>
 
-      <div class="col-sm-6">
+      <div class="col-md-6">
           <div id="complist-name-div">
               <h1 id="complist-name">{{ comp_list.name }}</h1>
               <button id="rename-list-button" class="btn btn-secondary">Rename</button>

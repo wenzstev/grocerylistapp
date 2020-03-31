@@ -1,39 +1,43 @@
 {% extends 'layout.html' %}
 
 {% block content %}
+
 <h1>Your Lists</h1>
-
-
+{% if user_lists|length < 1%}
+<h6 class="text-muted font-italic text-light">You haven't made any lists yet! Click the card below to get started.</h6>
+{% endif %}
+<div class="card-deck">
 {% for list in user_lists %}
-<div class="card recipe-card">
-    <div class="card-body">
-        <h5><a href="{{url_for('checklist.compiled_list', hex_name=list.hex_name)}}" class="stretched-link card-title">{{list.name}}</a></h5>
-        {% for recipe in list.sample_recipes %}
-            <h6 class="card-subtitle mb-2 text-muted">{{ recipe.name }}</h6>
-        {% endfor %}
-        {% if list.leftover_recipes > 0 %}
-            <p class="card-text font-italic text-muted">...and {{list.leftover_recipes}} more. </p>
-        {% endif %}
-    </div>
-</div>
-{% else %}
-<h3>You haven't made any lists yet.</h3>
-<div class="card">
-    <div class="card-body">
-        <form method="POST" action="{{url_for('checklist.create', method='url')}}">
-            {{ url_form.hidden_tag() }}
-            <div class="form-row">
-                <div class="col">
-                {{ url_form.url(class="form-control", placeholder=url_form.url.label.text) }}
-                </div>
-                <div class="col">
-                {{ url_form.submit(class="btn btn-primary") }}
-                </div>
+        <div class="card recipe-card my-3">
+            <div class="card-body">
+                <h5><a href="{{url_for('checklist.compiled_list', hex_name=list.hex_name)}}" class="stretched-link card-title">{{list.name}}</a></h5>
+                {% for recipe in list.sample_recipes %}
+                    <h6 class="card-subtitle mb-2 text-muted">{{ recipe.name }}</h6>
+                {% endfor %}
+                {% if list.leftover_recipes > 0 %}
+                    <p class="card-text font-italic text-muted">...and {{list.leftover_recipes}} more. </p>
+                {% endif %}
             </div>
-        </form>
-    </div>
-</div>
+        </div>
+    {% if loop.index % 2 == 0 %}
+        <div class="w-100 d-none d-sm-block d-md-none"><!-- wrap every 2 on small --></div>
+    {% endif %}
+    {% if loop.index % 3 == 0 %}
+        <div class="w-100 d-none d-md-block d-lg-none"><!-- wrap every 3 on medium --></div>
+    {% endif %}
+    {% if loop.index % 4 == 0 %}
+        <div class="w-100 d-none d-lg-block d-xl-none"><!-- wrap every 4 on large --></div>
+    {% endif %}
+    {% if loop.index % 5 == 0 %}
+        <div class="w-100 d-none d-xl-block"><!-- wrap every 5 on extra large --></div>
+    {% endif %}
 {% endfor %}
-
+        <div class="card recipe-card my-3">
+            <div class="card-body">
+                <h5><a href="{{url_for('checklist.create_list_page')}}" class="stretched-link card-title">Create a New Grocery List</a></h5>
+                <p class="card-subtitle mb-2 text-muted font-italic">Create a new grocery list via url or manually.</p>
+            </div>
+        </div>
+</div>
 
 {% endblock content %}

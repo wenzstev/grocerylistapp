@@ -34,7 +34,9 @@
                 {% endif %}
                 {% if grocery_lists %}
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#">My Lists<span class="caret"></span></a>
+                        <a class="nav-link" data-toggle="dropdown" href="#" role="button">
+                            My Lists
+                        </a>
                         <div class="dropdown-menu">
                             {% for list in grocery_lists %}
                                 <a class="nav-link dropdown-item" id="link-{{list.hex_name}}" href="{{url_for('checklist.compiled_list', hex_name=list.hex_name)}}">{{ list.name }} ({{ list.hex_name }})</a>
@@ -43,6 +45,7 @@
                     </li>
                 {% endif %}
                 {% if current_user.is_authenticated %}
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('checklist.create_list_page') }}">Create New List</a></li>
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('account.logout') }}">Logout</a></li>
                 {% endif %}
             </ul>
