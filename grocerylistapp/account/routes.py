@@ -24,28 +24,37 @@ def user_homepage():
 
 @account.route('/register', methods=['GET', 'POST'])
 def register():
-    if current_user.is_authenticated:
+    if current_user.is_authenticated and not current_user.temporary:
         return redirect(url_for('main.home'))
 
     register_form = RegistrationForm()
+    grocery_lists = CompiledList.query.filter_by(user_id=current_user.id).all()
+
     if register_form.validate_on_submit():
         print('here')
         hashed_password = bcrypt.generate_password_hash(register_form.password.data).decode('utf-8')
-        user = User(username=register_form.username.data, email=register_form.email.data, password=hashed_password)
-        try:
+        if not current_user.is_authenticated:
+            user = User(username=register_form.username.data, email=register_form.email.data, password=hashed_password)
             db.session.add(user)
+        else:
+            user = User.query.get(current_user.id)
+            user.username = register_form.username.data
+            user.email = register_form.email.data
+            user.password = hashed_password
+            user.temporary = False
+
+        try:
             db.session.commit()
             flash("Account created successfully!", "success")
-            login_user(user)
         except exc.IntegrityError as error:
             db.session.rollback()
             print(error.args)
             flash('Error. Username or email is already in use. Please choose a new one.', 'danger')
-            return render_template('register.html', register_form=register_form)
+            return render_template('register.html', register_form=register_form, grocery_lists=grocery_lists)
 
-        return redirect(url_for('main.home'))
+        return redirect(url_for('account.login'))
 
-    return render_template('register.html', register_form=register_form)
+    return render_template('register.html', register_form=register_form, grocery_lists=grocery_lists)
 
 
 @account.route('/login', methods=['GET', 'POST'])

@@ -3,7 +3,7 @@ import json, secrets, random, requests
 from bs4 import BeautifulSoup
 
 from grocerylistapp import db
-from grocerylistapp.models import RecipeList, CompiledList, RawLine, CleanedLine
+from grocerylistapp.models import RecipeList, CompiledList, RawLine, CleanedLine, User
 from grocerylistapp.nlp import color_entities_in_line
 
 
@@ -123,3 +123,14 @@ def get_title(url):
     soup = BeautifulSoup(res.text, 'lxml')
 
     return soup.title.string
+
+
+def create_guest_user():
+    guest_username = secrets.token_urlsafe(8)
+    guest_password = secrets.token_urlsafe(8)
+    guest_email = secrets.token_urlsafe(8)
+
+    guest_user = User(username=guest_username, password=guest_password, email=guest_email, temporary=True)
+    db.session.add(guest_user)
+    db.session.commit()
+    return guest_user

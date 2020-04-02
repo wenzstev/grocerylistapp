@@ -1,12 +1,12 @@
 import json, pdfkit
 
 from flask import Blueprint, redirect, url_for, flash, render_template, request, jsonify, make_response, abort
-from flask_login import current_user
+from flask_login import current_user, login_user
 
 from grocerylistapp import db
 from grocerylistapp.models import CompiledList, CleanedLine, RecipeList, RawLine
 from grocerylistapp.forms import CustomRecipeForm, RecipeURLForm
-from grocerylistapp.constructors import CompiledIngredientLine, create_recipe_from_url, create_recipe_from_text
+from grocerylistapp.constructors import CompiledIngredientLine, create_recipe_from_url, create_recipe_from_text, create_guest_user
 
 from grocerylistapp.checklist.forms import ExportToPDFForm, ExportToEmailForm
 from grocerylistapp.checklist.utils import sort_list, email_list, create_list
@@ -69,7 +69,12 @@ def create_list_page():
 
 @checklist.route('/list/create/<string:method>', methods=['GET', 'POST'])
 def create_methods(method):
-    new_list = create_list(current_user.id)
+    if current_user.is_authenticated:
+        new_list = create_list(current_user.id)
+    else:   # we need to create a temporary guest account
+        guest_user = create_guest_user()
+        login_user(guest_user)
+        new_list = create_list(guest_user.id, list_name="Guest List")
 
     # figure out how the list was created
     print(request.form)

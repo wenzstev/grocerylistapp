@@ -6,8 +6,8 @@
 
     <div class="panel panel-default">
         <div class="panel-body">
-            <p class="text-center">To get started, please paste the url of the recipe you would like to add:</p>
-
+            <p class="text-center">To get started, please paste the url of the recipe you would like to add below.
+            You can create an account to save your lists and view other lists, or create a temporary list just as a guest.</p>
             <form method="POST" action="{{url_for('checklist.create_methods', method='url')}}">
                 {{ url_form.hidden_tag() }}
                 <fieldset>

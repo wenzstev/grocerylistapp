@@ -14,7 +14,12 @@ main = Blueprint('main', __name__)
 @main.route('/', methods=['GET', 'POST'])
 def home():
     if current_user.is_authenticated:
-        return redirect(url_for('account.user_homepage'))
+        if not current_user.temporary:
+            return redirect(url_for('account.user_homepage'))
+        else:
+            flash('You are currently logged in as a guest and your account is temporary. Please register a permanent account to save your list and make additional lists!', 'info')
+            return redirect(url_for('account.register'))
+
 
     url_form = RecipeURLForm(prefix="url")
     custom_form = CustomRecipeForm(prefix="custom")

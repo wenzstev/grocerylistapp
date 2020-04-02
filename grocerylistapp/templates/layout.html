@@ -32,21 +32,33 @@
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('account.register') }}">Register</a></li>
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('account.login') }}">Login</a></li>
                 {% endif %}
-                {% if grocery_lists %}
-                    <li class="nav-item dropdown">
-                        <a class="nav-link" data-toggle="dropdown" href="#" role="button">
-                            My Lists
-                        </a>
-                        <div class="dropdown-menu">
-                            {% for list in grocery_lists %}
-                                <a class="nav-link dropdown-item" id="link-{{list.hex_name}}" href="{{url_for('checklist.compiled_list', hex_name=list.hex_name)}}">{{ list.name }} ({{ list.hex_name }})</a>
-                            {% endfor %}
-                        </div>
-                    </li>
-                {% endif %}
+
                 {% if current_user.is_authenticated %}
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('checklist.create_list_page') }}">Create New List</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('account.logout') }}">Logout</a></li>
+                    {% if not current_user.temporary %}
+                        {% if grocery_lists %}
+                            <li class="nav-item dropdown">
+                                <a class="nav-link" data-toggle="dropdown" href="#" role="button">
+                                    My Lists
+                                </a>
+                                <div class="dropdown-menu">
+                                    {% for list in grocery_lists %}
+                                        <a class="nav-link dropdown-item" id="link-{{list.hex_name}}" href="{{url_for('checklist.compiled_list', hex_name=list.hex_name)}}">{{ list.name }} ({{ list.hex_name }})</a>
+                                    {% endfor %}
+                                </div>
+                            </li>
+                        {% endif %}
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('checklist.create_list_page') }}">Create New List</a></li>
+                    {% else %}
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('checklist.compiled_list', hex_name=grocery_lists[0].hex_name) }}">Your List</a></li>
+                    {% endif %}
+            </ul>
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item navbar-text mr-3">Welcome, {{current_user.username if not current_user.temporary else "Guest"}}</li>
+                    {% if current_user.temporary %}
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('account.register') }}">Register Account</a></li>
+                    {% else %}
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('account.logout') }}">Logout</a></li>
+                    {% endif %}
                 {% endif %}
             </ul>
 
@@ -63,6 +75,9 @@
         {% endif %}
     {% endwith %}
     {% block content %}{% endblock %}
+    {% if current_user.is_authenticated%}
+    <small class="fixed-bottom">Logged in as {{current_user.username}}</small>
+    {% endif %}
 </div>
 
 <!-- jQuery first, then Popper.js, then Bootstrap JS -->

@@ -29,6 +29,13 @@
               <h1 id="complist-name">{{ comp_list.name }}</h1>
               <button id="rename-list-button" class="btn btn-secondary">Rename</button>
           </div>
+          {% if current_user.temporary %}
+          <div>
+              <p class="font-italic text-muted">This is a temporary guest list. To make your list permanent (and create additional lists), please
+                  <a href="{{ url_for('account.register') }}">register an account.</a>
+              </p>
+          </div>
+          {% endif %}
           <div id="list-tool-panel">
               <button data-toggle="modal" data-target="#printModal" class="btn btn-info">Print</button>
               <button data-toggle="modal" data-target="#exportModal" class="btn btn-info">Email</button>

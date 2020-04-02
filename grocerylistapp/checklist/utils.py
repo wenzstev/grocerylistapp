@@ -14,11 +14,10 @@ line_colors = {
 }
 
 
-
-def create_list(user_id):
+def create_list(user_id, list_name="Untitled List"):
     # create new list
     random_hex = secrets.token_urlsafe(8)
-    new_list = CompiledList(hex_name=random_hex, user_id=user_id)
+    new_list = CompiledList(hex_name=random_hex, user_id=user_id, name=list_name)
     db.session.add(new_list)
     db.session.commit()
 
