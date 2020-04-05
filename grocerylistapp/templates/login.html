@@ -37,6 +37,7 @@
                 {{ login_form.submit(class='btn btn-primary') }}
             </div>
         </form>
+        <small class="font-italic"><a href="{{ url_for('account.reset_request') }}">I forgot my username or password.</a></small>
     </div>
 </div>
 {% endblock content %}

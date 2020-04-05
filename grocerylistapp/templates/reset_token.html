@@ -1,0 +1,39 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+
+<div class="card mt-4">
+    <div class="card-body bg-light">
+        <h5 class="card-title">Reset Your Password</h5>
+        <form method="POST" action="">
+            {{ reset_form.hidden_tag() }}
+            <div class="form-group">
+                {{ reset_form.password.label(class='form-control-label') }}
+                {% if reset_form.password.errors %}
+                    {{ reset_form.password(class='form-control is-invalid') }}
+                    {% for error in reset_form.password.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                {% else %}
+                    {{ reset_form.password(class='form-control') }}
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ reset_form.confirm_password.label(class='form-control-label') }}
+                {% if reset_form.confirm_password.errors %}
+                    {{ reset_form.confirm_password(class='form-control is-invalid') }}
+                    {% for error in reset_form.confirm_password.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                {% else %}
+                    {{ reset_form.confirm_password(class='form-control') }}
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ reset_form.submit(class='btn btn-primary') }}
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock content %}
