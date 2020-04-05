@@ -1,6 +1,7 @@
 import secrets
 
-from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+from itsdangerous import TimedJSONWebSignatureSerializer as TimedSerializer
+from itsdangerous import JSONWebSignatureSerializer as Serializer
 
 from flask import current_app
 from flask_login import UserMixin
@@ -73,6 +74,7 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
+    email_validated = db.Column(db.Boolean, default=False)
     password = db.Column(db.String(60), nullable=False)
     temporary = db.Column(db.Boolean, default=False)  # determines if user account is temporary (for guest users)
     checklists = db.relationship('CompiledList', backref='user', lazy=True)  # the user's grocery lists
@@ -81,11 +83,27 @@ class User(db.Model, UserMixin):
         return f"(User('{self.username}', '{self.email}'"
 
     def get_reset_token(self, expires_sec=1800):
-        s = Serializer(current_app.config['SECRET_KEY'], expires_sec)
+        s = TimedSerializer(current_app.config['SECRET_KEY'], expires_sec)
+        return s.dumps({'user_id': self.id}).decode('utf-8')
+
+    # TODO: combine this with get_reset_token
+    def get_validate_token(self):
+        s = Serializer(current_app.config['SECRET_KEY'])
         return s.dumps({'user_id': self.id}).decode('utf-8')
 
     @staticmethod
     def verify_reset_token(token):
+        s = TimedSerializer(current_app.config['SECRET_KEY'])
+        try:
+            user_id = s.loads(token)['user_id']
+        except:
+            return None
+
+        return User.query.get(user_id)
+
+    # TODO: combine this with verify_reset_token
+    @staticmethod
+    def verify_email_token(token):
         s = Serializer(current_app.config['SECRET_KEY'])
         try:
             user_id = s.loads(token)['user_id']

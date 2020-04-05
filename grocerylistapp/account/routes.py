@@ -7,7 +7,7 @@ from grocerylistapp.forms import RecipeURLForm, CustomRecipeForm
 from grocerylistapp.constructors import ChecklistCard
 
 from grocerylistapp.account.forms import RegistrationForm, LoginForm, EditForm, ResetRequestForm, ResetPasswordForm, ChangePasswordForm
-from grocerylistapp.account.utils import send_reset_email
+from grocerylistapp.account.utils import send_reset_email, send_validate_email
 
 account = Blueprint('account', __name__)
 
@@ -45,6 +45,7 @@ def register():
         try:
             db.session.commit()
             flash("Account created successfully!", "success")
+            send_validate_email(user)
         except exc.IntegrityError as error:
             db.session.rollback()
             print(error.args)
@@ -140,6 +141,9 @@ def reset_request():
         if not user:
             flash('Error: no account associated with this email. ', 'danger')
             return redirect(url_for('account.reset_request'))
+        if not user.email_verified:
+            flash('This user does not have a verified email address.', 'danger')
+            return redirect(url_for('account.reset_request'))
         send_reset_email(user)
         flash('An email has been sent with instructions to reset your password.', 'success')
         return redirect(url_for('account.login'))
@@ -164,3 +168,15 @@ def reset_token(token):
         return redirect(url_for('account.login'))
 
     return render_template('reset_token.html', reset_form=reset_form)
+
+
+@account.route("/verify_email/<token>")
+def verify_email(token):
+    user = User.verify_email_token(token)
+    if not user:
+        flash('This is an invalid validate request.', 'warning')
+        return redirect(url_for('main.home'))
+    user.email_validated = True
+    db.session.commit()
+    flash(f'The email account {user.email} has been validated!', 'success')
+    return redirect(url_for('main.home'))
