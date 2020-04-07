@@ -1,6 +1,10 @@
 import secrets
+from functools import wraps
+
+from flask import abort, request
 
 from flask_mail import Message
+from flask_login import current_user
 
 from grocerylistapp import db, mail
 from grocerylistapp.models import RecipeList, CompiledList
@@ -71,3 +75,20 @@ def email_list(email, comp_list, list_lines, recipe_list):
     msg.html = list_html
 
     mail.send(msg)
+
+
+def owner_only(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        current_list = CompiledList.query.filter_by(hex_name=kwargs.get('hex_name', '')).first()
+        if not current_list:
+            # try to get from form
+            current_list = CompiledList.query.filter_by(hex_name=request.form.get('list', '', type=str)).first_or_404()
+        if not current_list:
+            # this shouldn't happen
+            return abort(500)
+        if current_list.user_id != current_user.id:
+            return abort(403)
+
+        return func(*args, **kwargs)
+    return wrapper
