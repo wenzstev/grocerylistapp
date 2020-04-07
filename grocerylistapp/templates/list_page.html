@@ -21,13 +21,17 @@
                 </div>
               {% endfor %}
           </div>
+          {% if user_is_owner %}
           <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addRecipeModal"> Add Recipe </button>
+          {% endif %}
       </div>
 
       <div class="col-md-6">
           <div id="complist-name-div">
               <h1 id="complist-name">{{ comp_list.name }}</h1>
+              {% if user_is_owner %}
               <button id="rename-list-button" class="btn btn-secondary">Rename</button>
+              {% endif %}
           </div>
           {% if current_user.temporary %}
           <div>
@@ -36,27 +40,37 @@
               </p>
           </div>
           {% endif %}
+          {% if not user_is_owner %}
+          <div>
+              <p class="font-italic text-muted">Created by {{creator.username}}</p>
+          </div>
+          {% endif %}
           <div id="list-tool-panel">
               <button data-toggle="modal" data-target="#printModal" class="btn btn-info">Print</button>
               <button data-toggle="modal" data-target="#exportModal" class="btn btn-info">Email</button>
+              {% if not user_is_owner %}
+              <a href="{{url_for('checklist.copy_list', hex_name=comp_list.hex_name)}}" class="btn btn-success">Create Copy</a>
+              {% endif %}
           </div>
             <div class="list-group list-group-root " id="compiled-list">
                 {% for line in list_lines %}
                 <div id="full-{{line.hex_id}}" class="full-line">
                     <label id="label-{{line.hex_id}}" class="recipe-label">
-                        <input id="checkbox-{{line.hex_id}}" type="checkbox"{{line.checked}}>
+                        <input id="checkbox-{{line.hex_id}}" type="checkbox"{{line.checked}}{% if not user_is_owner%}disabled{% endif %}>
                         <span class="recipe-checkbox"></span>
                     </label>
                     <div id="line-{{line.hex_id}}" class="recipe-line">
                     <a href="#{{line.ingredient_id}}" class="list-group-item list-group-item-action recipe-list" data-toggle="collapse" aria-expanded="false" role="button">
-                        <button id=drag-{{line.hex_id}} class="drag-button">&#8801</button>
+                        <button id=drag-{{line.hex_id}} class="drag-button" {% if not user_is_owner%}disabled{% endif %}>&#8801</button>
                         <span class="ingredient-name">
                             {% for dot in line.color_dots %}
                             <span class="dot top-level d-none" style="background-color:{{dot}}"></span>
                             {% endfor %}
                             {{ line.ingredient }}
                         </span>
+                        {% if user_is_owner %}
                         <button id="delete-{{line.hex_id}}" class="remove-button">&#10005</button>
+                        {% endif %}
                     </a>
                     {% if line.raw_lines %}
                     <div class="list-group collapse" id="{{line.ingredient_id}}">
@@ -67,9 +81,11 @@
                                     <div class="recipe-div">"{{raw_line.full_text}}"</div>
                                     <div class="recipe-name recipe-div">{{raw_line.recipe.name}}</div>
                                 </div>
+                                {% if user_is_owner %}
                                 <div class="button-panel recipe-div">
                                     <button class="edit-button">Edit</button>
                                 </div>
+                                {% endif %}
                             </div>
                         {% endfor %}
                         </div>
@@ -79,10 +95,12 @@
                 {% endfor %}
             </div>
 
+          {% if user_is_owner %}
             <input id="add-line-input" class="form-control" type="text">
             <button id="add-line-submit" class="btn btn-secondary"> Add Line </button>
 
             <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteModal"> Delete </button>
+          {% endif%}
       </div>
     </div>
 

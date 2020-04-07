@@ -44,6 +44,7 @@ class CompiledIngredientLine:
                 self.color_dots.add(recipe.hex_color)
 
 
+
 class ChecklistCard:
     def __init__(self, checklist, num_samples):
         self.name = checklist.name

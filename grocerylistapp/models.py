@@ -63,6 +63,8 @@ class CleanedLine(db.Model):
     comp_list = db.Column(db.Integer, db.ForeignKey('compiled_list.id'))
     raw_lines = db.relationship('RawLine', backref='cleaned_line', lazy=True)   # the ingredient lines that were cleaned
 
+    def __repr__(self):
+        return f"{self.ingredient} in list {self.comp_list}"
 
 @login_manager.user_loader
 def load_user(user_id):
