@@ -2,10 +2,11 @@ import json
 from fractions import Fraction
 from grocerylistapp import nlp
 
+# at the moment, only using INGREDIENT, so the other classes are assigned a base class as well
 line_colors = {
     "INGREDIENT": "btn-ingredient",
-    "CARDINAL": "btn-amount",
-    "QUANTITY": "btn-measurement",
+    "CARDINAL": "btn-base",
+    "QUANTITY": "btn-base",
     "O": "btn-base"
 }
 

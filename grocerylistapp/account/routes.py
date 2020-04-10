@@ -24,10 +24,14 @@ def user_homepage():
 
 @account.route('/register', methods=['GET', 'POST'])
 def register():
-    if current_user.is_authenticated and not current_user.temporary:
-        return redirect(url_for('main.home'))
-
     register_form = RegistrationForm()
+
+    if current_user.is_authenticated:
+        if current_user.temporary:
+            guest_list = CompiledList.query.filter_by(user_id=current_user.id).all()
+            return render_template('register.html', register_form=register_form, grocery_lists=guest_list)
+        else:
+            return redirect(url_for('main.home'))
 
     if register_form.validate_on_submit():
         print('here')
@@ -54,7 +58,6 @@ def register():
             return render_template('register.html', register_form=register_form)
 
         return redirect(url_for('account.login'))
-
 
     return render_template('register.html', register_form=register_form)
 

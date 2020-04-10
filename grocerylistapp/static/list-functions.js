@@ -39,7 +39,7 @@ function clean_line(jsonData, place_to_append){
       var btn_class = $( this ).attr("class").match(patt)[0]
 
       $( this ).toggleClass(btn_class)
-      $( this ).toggleClass(b_dict[btn_class])
+      $( this ).toggleClass(b_simplified[btn_class])
 
     var children = clean_line.children('.word-button')
 
@@ -51,9 +51,11 @@ function clean_line(jsonData, place_to_append){
       button_colors.push([button_text, button_color])
     }
 
+    console.log(jsonData)
+
     var data = {
+      'hex_id': jsonData['hex_id'],
       'text_to_colors': JSON.stringify(button_colors),
-      'line_id': jsonData['line_id']
     }
 
     $.ajax({
@@ -134,13 +136,13 @@ $(document).ready(function(){
     console.log(line)
     var line_text = line.find('.recipe-line').text()
     console.log(line_text)
-    var id_info = line.attr('id').split('-')
-    console.log(id_info)
+
 
     var data = {
-      'hex_name': id_info[0],
-      'recipe_line': id_info[1]
+      'hex_id': line.attr('id')
     }
+
+    console.log(data)
 
     $.ajax({
       type: 'POST',

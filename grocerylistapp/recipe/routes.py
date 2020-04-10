@@ -1,4 +1,4 @@
-from flask import Blueprint, redirect, url_for, render_template, request, flash
+from flask import Blueprint, redirect, url_for, render_template, request, flash, jsonify
 from flask_login import current_user
 
 from grocerylistapp import db
@@ -18,8 +18,6 @@ def clean_recipe(list_name, new_recipe):
     rlist = RecipeList.query.filter_by(hex_name=new_recipe).first_or_404()
     rlist_lines = RawLine.query.filter_by(rlist=rlist).all()
 
-    print(rlist.recipe_url)
-
     if not rlist_lines:  # we failed to extract any lines from the recipe, redirect
         form = CustomRecipeForm()
         if form.validate_on_submit():
@@ -35,10 +33,7 @@ def clean_recipe(list_name, new_recipe):
         flash('Error: Could not parse recipe lines. Please paste or type recipe lines below: ', 'danger')
         return render_template('custom_add_recipe.html', form=form, rlist=rlist)
 
-    form = RecipeCleanForm(request.form)
-    if form.validate_on_submit():
-        print(form.name.data)
-
+    if request.method == "POST":  # we submitted the changes, time to create the cleaned lines
         current_list = CompiledList.query.filter_by(hex_name=list_name).first_or_404()
         current_list_lines = CleanedLine.query.filter_by(list=current_list).all()
 
@@ -48,7 +43,6 @@ def clean_recipe(list_name, new_recipe):
 
         # add recipe to the list
         rlist.compiled_list = current_list.id   # won't matter if recipe is already on the list
-        rlist.name = form.name.data
         db.session.commit()
 
         for line in rlist_lines:
@@ -83,10 +77,18 @@ def clean_recipe(list_name, new_recipe):
 
         return redirect(url_for('checklist.compiled_list', hex_name=current_list.hex_name))
 
-    form.name.data = rlist.name
-
     rlist_lines = [LineToPass(line) for line in rlist_lines]
 
     grocery_lists = CompiledList.query.filter_by(user_id=current_user.id)
 
-    return render_template('add_recipe.html', title="Adding Recipe", rlist=rlist, rlist_lines=rlist_lines, form=form, grocery_lists=grocery_lists)
+    return render_template('add_recipe.html', title="Adding Recipe", rlist=rlist, rlist_lines=rlist_lines, grocery_lists=grocery_lists)
+
+
+
+@recipe.route('/recipe/rename', methods=['POST'])
+def rename_recipe():
+    recipe_to_rename = RecipeList.query.filter_by(hex_name=request.form.get('recipe_id', '', type=str)).first_or_404()
+    recipe_to_rename.name = request.form.get('name', recipe.name, type=str)
+    db.session.commit()
+
+    return jsonify(new_name=recipe_to_rename.name)

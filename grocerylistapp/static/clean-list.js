@@ -1,7 +1,7 @@
+
+
 $(function(){
   var word_buttons = $('.word-button')
-  var hex_name = $('#hex-name').text()
-  console.log(hex_name)
 
   var b_cycle = ['btn-base', 'btn-ingredient', 'btn-amount', 'btn-measurement']
 
@@ -18,8 +18,10 @@ $(function(){
 
     var btn_class = $( this ).attr("class").match(patt)[0]
 
+    console.log(b_simplified)
+
     $( this ).toggleClass(btn_class)
-    $( this ).toggleClass(b_dict[btn_class])
+    $( this ).toggleClass(b_simplified[btn_class])
 
 
 
@@ -39,8 +41,7 @@ $(function(){
 
 
 
-    var data = {'hex_name': hex_name,
-                'recipe_line': line_id,
+    var data = {'hex_id': line_id,
                 'text_to_colors': JSON.stringify(button_colors)}
     console.log(data)
 
@@ -54,4 +55,27 @@ $(function(){
       }
     })
   });
+
+  $('#recipe-title').click(function(){
+    $(this).attr('spellcheck', 'true')
+  })
+
+  $('#recipe-title').focusout(change_recipe_name)
+  $('#recipe-title').keypress(function(event){
+    if (event.keycode = '13'){
+      event.preventDefault()
+      change_recipe_name()
+      $( this ).blur()
+    }
+  })
+
+  $('#submit-list').click(function(){
+    // create a small form and submit with empty post data, cleaning lines
+    // is handled server side
+    var form = $("<form action='' method='post'></form>")
+    $('body').append(form)
+    form.submit()
+  })
+
+
 });

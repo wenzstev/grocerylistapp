@@ -1,31 +1,40 @@
 {% extends 'layout.html' %}
 {% block content %}
-
-<form method="POST" action="">
-    {{ form.hidden_tag() }}
-    <div class="form-group">
-        {{ form.name(class="form-control") }}
+<div class="alert alert-info mt-3">
+    <p class="text-muted font-italic mt-4">Here's our best guess for the ingredients in the lines. Click a word to toggle if it is an <span class="btn-ingredient p-1">ingredient</span> or <span class="btn-base p-1">not</span>. </p>
+</div>
+<div class="card my-3">
+    <div class="card-header p-2">
+        <div class="edit-label w-100" id="recipe-title" contenteditable spellcheck="false">{{ rlist.name }}</div>
     </div>
-    <div class="form-group">
-        {{ form.submit(class="btn btn-primary") }}
-    </div>
-</form>
 
-    <h4 id='hex-name'>{{ rlist.hex_name }}</h4>
-
-    <ul class="list-group">
+    <div class="card-body">
+        <ul class="p-2">
         {% for line in rlist_lines %}
-        <div class="list-group-item btn-group" id="{{ line.id_in_list }}">
-            {% for token, color in line.text_to_colors %}
-                <button class="{{ color }} word-button" >{{ token }}</button>
-            {% endfor %}
-        </div>
-        {% endfor %}
-    </ul>
+            <li class="pb-2">
+            <div class="" id="{{ line.hex_id }}">
+                {% for token, color in line.text_to_colors %}
+                    <button class="{{ color }} word-button" >{{ token }}</button>
+                {% endfor %}
+            </div>
+            </li>
 
+        {% endfor %}
+        </ul>
+
+        <div class="row">
+            <div class="col-md-4 col-lg-2">
+                <button type="submit" id="submit-list" formmethod="post" class="mt-4 btn btn-success btn-block btn-lg">Submit</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 {% endblock content %}
 
 {% block scripts %}
 <script src="{{url_for('static', filename='clean-list.js')}}"></script>
+<script type="text/javascript">
+    $RECIPE_HEX = "{{rlist.hex_name}}"
+</script>
 {% endblock scripts %}

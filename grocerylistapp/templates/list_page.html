@@ -75,7 +75,7 @@
                     {% if line.raw_lines %}
                     <div class="list-group collapse" id="{{line.ingredient_id}}">
                         {% for raw_line in line.raw_lines %}
-                            <div class="list-group-item list-flex" data-toggle="collapse" id="{{raw_line.recipe.hex_name}}-{{raw_line.id_in_list}}">
+                            <div class="list-group-item list-flex" data-toggle="collapse" id="{{raw_line.hex_id}}">
                                 <div class="recipe-info">
                                     <span class="dot" style="background-color:{{raw_line.recipe.hex_color}}"></span>
                                     <div class="recipe-div">"{{raw_line.full_text}}"</div>

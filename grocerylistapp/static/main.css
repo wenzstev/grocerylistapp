@@ -110,18 +110,30 @@ a[data-toggle="collapse"] {
 
 .btn-ingredient {
   background-color: coral;
+  color: white;
+  font-style: normal;
+  cursor: pointer;
+
 }
 
 .btn-amount {
   background-color: darkorchid;
+  color: white;
+  font-style: normal;
+  cursor: pointer;
 }
 
 .btn-measurement {
   background-color: darkseagreen;
+  color: white;
 }
 
 .btn-base {
   background-color: darkgray;
+  color: white;
+  font-style: normal;
+  cursor: pointer;
+
 }
 
 .recipe-div {
@@ -322,4 +334,19 @@ a[data-toggle="collapse"] {
 .recipe-card .card-title:hover{
   color: dimgrey;
   text-decoration: none;
+}
+
+.edit-label {
+  resize: none;
+  overflow: auto;
+  background-color: transparent;
+  border: none;
+  padding: .25rem;
+  font-size: 25px;
+  cursor: pointer;
+}
+
+.edit-label:focus{
+  background-color: white;
+  cursor: text;
 }

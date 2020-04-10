@@ -12,7 +12,7 @@ class LineToPass:
     def __init__(self, list_line):
         self.full_text = list_line.full_text
         self.text_to_colors = json.loads(list_line.text_to_colors)
-        self.id_in_list = list_line.id_in_list
+        self.hex_id = list_line.hex_id
         self.list_id = list_line.list_id  # the ID of the RECIPELIST FIXME: these names need changing
         self.recipe = RecipeList.query.filter_by(id=self.list_id).first()
 
@@ -77,7 +77,7 @@ def create_recipe_from_url(url):
     recipe_lines = get_recipe_lines(url)  # TODO: possibly refactor code so that get_recipe_lines is here too
     for num, line in enumerate(recipe_lines):
         recipe_colors = color_entities_in_line(line)
-        recipe_line = RawLine(full_text=line, rlist=rlist, id_in_list=num, text_to_colors=recipe_colors)
+        recipe_line = RawLine(full_text=line, rlist=rlist, text_to_colors=recipe_colors)
         db.session.add(recipe_line)
     db.session.commit()
 
@@ -102,7 +102,7 @@ def create_recipe_from_text(title, recipe_text):
     for num, line in enumerate(recipe_lines):  # FIXME: this code is the same as in utils.url_to_recipe
         print(line)
         recipe_colors = color_entities_in_line(line)
-        recipe_line = RawLine(full_text=line, rlist=recipe, id_in_list=num, text_to_colors=recipe_colors)
+        recipe_line = RawLine(full_text=line, rlist=recipe, text_to_colors=recipe_colors)
         db.session.add(recipe_line)
     db.session.commit()
 

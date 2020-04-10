@@ -13,45 +13,22 @@ line = Blueprint('line', __name__)
 
 @line.route('/line/get_colors', methods=['GET', 'POST'])
 def get_colors():
-    # check if finding by line id or recipe hex
-    line_id = request.form.get('line_id', -1, int)
-    print(line_id)
-    if line_id > 0:  # if we have a line id
-        cur_line = RawLine.query.filter_by(line_id).first_or_404()
-    else:  # we're finding it from a recipe hex
-        recipe_hex = request.form.get('hex_name', '', str)
-        recipe_line = request.form.get('recipe_line', -1, int)
-        recipe = RecipeList.query.filter_by(hex_name=recipe_hex).first_or_404()
-        cur_line = RawLine.query.filter_by(rlist=recipe, id_in_list=recipe_line).first_or_404()
+    cur_line = RawLine.query.filter_by(hex_id=request.form.get('hex_id', '', str)).first_or_404()
 
-    return {'line_id': cur_line.id,
+    return {'hex_id': cur_line.hex_id,
             'parsed_line': json.loads(cur_line.text_to_colors)}
 
 
 @line.route('/line/set_color', methods=['GET', 'POST'])
 def set_color():
-    # check if we're finding by line id or by hex name
-    # TODO: refactor code so that this section and the identical section in get_colors are in one function
-    line_id = request.form.get('line_id', -1, int)
-    if line_id > 0:  # if we have a line id
-        print('going by id')
-        cur_line = RawLine.query.filter_by(id=line_id).first_or_404()
-    else:  # we're finding it from a recipe hex
-        print('going by hex')
-        recipe_hex = request.form.get('hex_name', '', str)
-        recipe_line = request.form.get('recipe_line', -1, int)
-        print(recipe_hex, recipe_line)
-        recipe = RecipeList.query.filter_by(hex_name=recipe_hex).first_or_404()
-        cur_line = RawLine.query.filter_by(rlist=recipe, id_in_list=recipe_line).first_or_404()
-        print(cur_line)
 
+    print(request.form)
+
+    cur_line = RawLine.query.filter_by(hex_id=request.form.get('hex_id', '', str)).first_or_404()
     new_colors = request.form.get('text_to_colors', '', type=str)
-    print(request.form.get('text_to_colors'))
-    print(request.is_json)
-    print('new colors', new_colors)
-
     cur_line.text_to_colors = new_colors
     db.session.commit()
+
     #  check if there is a cleaned line for this raw line yet
     if cur_line.cline_id:
         amount, measurement, ingredient = extract_ingredients(cur_line.text_to_colors)

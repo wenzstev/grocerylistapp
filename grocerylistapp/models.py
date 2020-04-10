@@ -42,7 +42,7 @@ class CompiledList(db.Model):
 class RawLine(db.Model):
     # TODO: refactor so there are less 'id' labels
     id = db.Column(db.Integer, primary_key=True)  # the primary key
-    id_in_list = db.Column(db.Integer, nullable=False)  # id in the grocery list (for requests)
+    hex_id = db.Column(db.String(8), default=get_hex_id, nullable=False, unique=True) # hex identifier for requests
     full_text = db.Column(db.String(100), nullable=False)  # the text of the line
     list_id = db.Column(db.Integer, db.ForeignKey('recipe_list.id'))  # the id of the list for the line
     cline_id = db.Column(db.ForeignKey('cleaned_line.id'))  # the id of the cleaned line
