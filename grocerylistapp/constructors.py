@@ -33,7 +33,7 @@ class CompiledIngredientLine:
             self.checked = " checked"
 
         # get list of all raw lines that make up the cleaned line
-        self.raw_lines = RawLine.query.filter_by(cleaned_line=cleaned_line).all()
+        self.raw_lines = cleaned_line.raw_lines
 
         self.raw_lines = [LineToPass(line) for line in self.raw_lines]
 

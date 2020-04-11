@@ -28,10 +28,12 @@ def set_color():
     new_colors = request.form.get('text_to_colors', '', type=str)
     cur_line.text_to_colors = new_colors
     db.session.commit()
+    print(cur_line.text_to_colors)
 
     #  check if there is a cleaned line for this raw line yet
-    if cur_line.cline_id:
-        amount, measurement, ingredient = extract_ingredients(cur_line.text_to_colors)
+    cleaned_lines = cur_line.cleaned_lines
+    if len(cleaned_lines) > 0:
+        amount, measurement, ingredients = extract_ingredients(cur_line.text_to_colors)
         print('getting cleaned line:', cur_line.cline_id)
         cur_cleaned_line = CleanedLine.query.filter_by(id=cur_line.cline_id).first_or_404()
         # check if there is more than one raw line that points to this cleaned line

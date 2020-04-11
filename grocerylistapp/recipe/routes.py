@@ -46,18 +46,9 @@ def clean_recipe(list_name, new_recipe):
         db.session.commit()
 
         for line in rlist_lines:
-            amount, measurement, ingredient = extract_ingredients(line.text_to_colors)
-            if ingredient != '':  # only create cleaned line if we found an ingredient
+            amount, measurement, ingredients = extract_ingredients(line.text_to_colors)
+            for ingredient in ingredients:
                 if ingredient not in ingredient_dict:
-
-                    # check if rawline already has a cleanedline
-                    if line.cline_id:
-                        # remove the old line
-                        cleaned_line_to_delete = CleanedLine.query.filter_by(id=line.cline_id).first()
-                        raw_line_check_list = RawLine.query.filter_by(cleaned_line=cleaned_line_to_delete).all()
-                        if len(raw_line_check_list) == 1:  # check if other RawLines link to this CompiledLine
-                            db.session.delete(cleaned_line_to_delete)
-                            db.session.commit()
 
                     cleaned_line = CleanedLine(amount=amount,
                                                measurement=measurement,
@@ -69,11 +60,11 @@ def clean_recipe(list_name, new_recipe):
                     db.session.add(cleaned_line)
                     db.session.commit()
 
-                    line.cleaned_line = cleaned_line
+                    line.cleaned_lines.append(cleaned_line)
                     ingredient_dict[ingredient] = cleaned_line
                     db.session.commit()
                 else:
-                    line.cleaned_line = ingredient_dict[ingredient]
+                    line.cleaned_lines.append(ingredient_dict[ingredient])
 
         return redirect(url_for('checklist.compiled_list', hex_name=current_list.hex_name))
 

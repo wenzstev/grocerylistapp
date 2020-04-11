@@ -16,23 +16,24 @@ def extract_ingredients(color_string,
                         ingredient_color="text-success",
                         cardinal_color="text-warning",
                         quantity_color="text-primary"):
-    ingredient = ''
-    measurement = ''
-    amount = 0
+    ingredients = []    # list of ingredients in the line
+    measurement = ''    # not currently used
+    amount = 0          # not currently used
     color_dict = json.loads(color_string)
+    in_ingredient = False
+    current_ingredient = ''
     for word, color in color_dict:
-        print(word, color)
         if color == line_colors["INGREDIENT"]:
-            ingredient += word + ' '
-        elif color == line_colors["CARDINAL"]:
-            amount = float(sum(Fraction(s) for s in word.split()))  # treat the string as a fraction and sum
-        elif color == line_colors["QUANTITY"]:
-            try:
-                amount = float(sum(Fraction(s) for s in word.split()))  # see if the word is an amount
-            except ValueError:  # if it's not an amount
-                measurement += word + ' '
+            in_ingredient = True
+            current_ingredient += word + ' '
+        elif in_ingredient:
+            in_ingredient = False
+            ingredients.append(current_ingredient)
+            current_ingredient = ''
+    if current_ingredient:
+        ingredients.append(current_ingredient)
 
-    return amount, measurement, ingredient
+    return amount, measurement, ingredients
 
 
 def color_entities_in_line(line, line_colors=line_colors):

@@ -39,14 +39,20 @@ class CompiledList(db.Model):
         return f"{self.name}"
 
 
+line_assocs = db.Table('line_assocs',
+                       db.Column('rawline_id', db.Integer, db.ForeignKey('raw_line.id')),
+                       db.Column('cleanedline_id', db.Integer, db.ForeignKey('cleaned_line.id'))
+                       )
+
+
 class RawLine(db.Model):
     # TODO: refactor so there are less 'id' labels
     id = db.Column(db.Integer, primary_key=True)  # the primary key
     hex_id = db.Column(db.String(8), default=get_hex_id, nullable=False, unique=True) # hex identifier for requests
     full_text = db.Column(db.String(100), nullable=False)  # the text of the line
     list_id = db.Column(db.Integer, db.ForeignKey('recipe_list.id'))  # the id of the list for the line
-    cline_id = db.Column(db.ForeignKey('cleaned_line.id'))  # the id of the cleaned line
     text_to_colors = db.Column(db.String)
+    cleaned_lines = db.relationship('CleanedLine', secondary=line_assocs, backref=db.backref('raw_lines', lazy='dynamic'))
 
     def __repr__(self):
         return f"{self.full_text}"
@@ -61,10 +67,13 @@ class CleanedLine(db.Model):
     ingredient = db.Column(db.String(100), nullable=False)  # the ingredient (required)
     checked = db.Column(db.Boolean, default=False)  # whether or not the item is checked off the list
     comp_list = db.Column(db.Integer, db.ForeignKey('compiled_list.id'))
-    raw_lines = db.relationship('RawLine', backref='cleaned_line', lazy=True)   # the ingredient lines that were cleaned
 
     def __repr__(self):
         return f"{self.ingredient} in list {self.comp_list}"
+
+
+
+
 
 @login_manager.user_loader
 def load_user(user_id):

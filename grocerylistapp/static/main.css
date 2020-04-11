@@ -113,8 +113,24 @@ a[data-toggle="collapse"] {
   color: white;
   font-style: normal;
   cursor: pointer;
+}
+
+.btn-ingredient:first-child{
+  border-radius: 10px 0px 0px 10px;
+}
+
+.btn-ingredient:last-child{
+  border-radius: 0px 10px 10px 0px;
+}
+
+.btn-ingredient:only-child{
+  border-radius: 10px;
+}
+
+.ingredient-group {
 
 }
+
 
 .btn-amount {
   background-color: darkorchid;
@@ -129,11 +145,12 @@ a[data-toggle="collapse"] {
 }
 
 .btn-base {
-  background-color: darkgray;
-  color: white;
   font-style: normal;
   cursor: pointer;
-
+  border: none;
+  padding: 5px;
+  margin: 0px;
+  background-color: inherit;
 }
 
 .recipe-div {
@@ -349,4 +366,14 @@ a[data-toggle="collapse"] {
 .edit-label:focus{
   background-color: white;
   cursor: text;
+}
+
+.recipe-list-item{
+  list-style-type: none;
+  background:cornsilk;
+  border-radius:5px;
+}
+
+.recipe-card-body{
+  background-color: ghostwhite;
 }

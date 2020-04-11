@@ -1,29 +1,27 @@
 {% extends 'layout.html' %}
 {% block content %}
 <div class="alert alert-info mt-3">
-    <p class="text-muted font-italic mt-4">Here's our best guess for the ingredients in the lines. Click a word to toggle if it is an <span class="btn-ingredient p-1">ingredient</span> or <span class="btn-base p-1">not</span>. </p>
+    <p class="text-muted font-italic mt-4">Here's our best guess for the ingredients in the lines. Click a word to toggle if it is an <span style="border-radius: 10px" class="btn-ingredient p-1">ingredient</span> or not. </p>
 </div>
-<div class="card my-3">
-    <div class="card-header p-2">
-        <div class="edit-label w-100" id="recipe-title" contenteditable spellcheck="false">{{ rlist.name }}</div>
+<div class="card my-3 shadow">
+    <div class="card-header p-2 shadow-sm">
+        <div class="edit-label w-100 text-center" id="recipe-title" contenteditable spellcheck="false">{{ rlist.name }}</div>
     </div>
 
-    <div class="card-body">
+    <div class="card-body p-1 recipe-card-body">
         <ul class="p-2">
         {% for line in rlist_lines %}
-            <li class="pb-2">
-            <div class="" id="{{ line.hex_id }}">
-                {% for token, color in line.text_to_colors %}
-                    <button class="{{ color }} word-button" >{{ token }}</button>
-                {% endfor %}
-            </div>
+            <li class="p-2 m-2 shadow-sm recipe-list-item">
+                <div class="raw-line" id="{{ line.hex_id }}">
+                    <span></span> <!-- fake beginning object to make changing button groups easier -->
+                    {% for token, color in line.text_to_colors %}<button class="{{ color }} word-button float-none" >{{ token }}</button>{% endfor %}
+                    <span></span> <!-- fake ending object to make changing button groups easier -->
+                </div>
             </li>
-
         {% endfor %}
         </ul>
-
-        <div class="row">
-            <div class="col-md-4 col-lg-2">
+        <div class="row justify-content-center">
+            <div class="col-md-4 col-lg-2 mb-2">
                 <button type="submit" id="submit-list" formmethod="post" class="mt-4 btn btn-success btn-block btn-lg">Submit</button>
             </div>
         </div>
