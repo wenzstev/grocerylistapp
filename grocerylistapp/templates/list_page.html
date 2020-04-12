@@ -26,13 +26,8 @@
           {% endif %}
       </div>
 
-      <div class="col-md-6">
-          <div id="complist-name-div">
-              <h1 id="complist-name">{{ comp_list.name }}</h1>
-              {% if user_is_owner %}
-              <button id="rename-list-button" class="btn btn-secondary">Rename</button>
-              {% endif %}
-          </div>
+      <div class="col-md-6 my-3">
+          <div class="edit-label" id="complist-name" contenteditable>{{ comp_list.name }}</div>
           {% if current_user.temporary %}
           <div>
               <p class="font-italic text-muted">This is a temporary guest list. To make your list permanent (and create additional lists), please

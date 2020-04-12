@@ -157,6 +157,8 @@ $(document).ready(function(){
     })
   })
 
+  $('.edit-label').focusout(change_recipe_name)
+
   $('#rename-list-button').on("click", function(){
     var complist_div = $("#complist-name-div")
     var list_name = $("#complist-name").text()

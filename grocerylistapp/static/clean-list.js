@@ -1,8 +1,8 @@
 // link ingredients into a button-group
+var button_group = "<div class='btn-group ingredient-group d-inline align-baseline'></div>"
 
 function create_ingredient_groups(){
   $(".raw-line").each(function(){  // iterate through each line
-    button_group = "<div class='btn-group ingredient-group d-inline align-baseline'></div>"
     current_group = $(button_group) // create button group div
     current_line = $(this)
     $( this ).children().each(function(){

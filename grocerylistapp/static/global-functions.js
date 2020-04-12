@@ -21,3 +21,7 @@ var b_simplified = {
   'btn-ingredient': 'btn-base',
   'btn-base': 'btn-ingredient'
 }
+
+function change_name(){
+
+}
