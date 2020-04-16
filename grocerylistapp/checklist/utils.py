@@ -83,7 +83,7 @@ def owner_only(func):
         current_list = CompiledList.query.filter_by(hex_name=kwargs.get('hex_name', '')).first()
         if not current_list:
             # try to get from form
-            current_list = CompiledList.query.filter_by(hex_name=request.form.get('list', '', type=str)).first_or_404()
+            current_list = CompiledList.query.filter_by(hex_name=request.form.get('id', '', type=str)).first_or_404()
         if not current_list:
             # this shouldn't happen
             return abort(500)

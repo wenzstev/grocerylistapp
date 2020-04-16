@@ -47,14 +47,15 @@ def clean_recipe(list_name, new_recipe):
 
         for line in rlist_lines:
             amount, measurement, ingredients = extract_ingredients(line.text_to_colors)
-            for ingredient in ingredients:
+            for ingredient, index in enumerate(ingredients):
                 if ingredient not in ingredient_dict:
 
                     cleaned_line = CleanedLine(amount=amount,
                                                measurement=measurement,
                                                ingredient=ingredient,
                                                list=current_list,
-                                               index_in_list=current_list_length)
+                                               index_in_list=current_list_length,
+                                               rawline_index=index)
                     current_list_length += 1  # add one to get the new length of the list
 
                     db.session.add(cleaned_line)

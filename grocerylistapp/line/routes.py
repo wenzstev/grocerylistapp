@@ -15,6 +15,8 @@ line = Blueprint('line', __name__)
 def get_colors():
     cur_line = RawLine.query.filter_by(hex_id=request.form.get('hex_id', '', str)).first_or_404()
 
+    print(cur_line.text_to_colors)
+
     return {'hex_id': cur_line.hex_id,
             'parsed_line': json.loads(cur_line.text_to_colors)}
 
@@ -24,26 +26,58 @@ def set_color():
 
     print(request.form)
 
-    cur_line = RawLine.query.filter_by(hex_id=request.form.get('hex_id', '', str)).first_or_404()
+    # get ingredients before changing so that we can compare (performance hit?)
+    amount, measurement, old_ingredients = extract_ingredients(cur_line.text_to_colors)
+
+    cur_line = RawLine.query.filter_by(hex_id=request.form.get('rawline_id', '', str)).first_or_404()
     new_colors = request.form.get('text_to_colors', '', type=str)
     cur_line.text_to_colors = new_colors
     db.session.commit()
     print(cur_line.text_to_colors)
 
-    #  check if there is a cleaned line for this raw line yet
-    cleaned_lines = cur_line.cleaned_lines
-    if len(cleaned_lines) > 0:
+    # check if we have a cleaned line as well
+    cline_to_change = CleanedLine.query.filter_by(hex_id=request.form.get('cleanedline_id')).first()
+    if cline_to_change:
+        # recalculate the line
         amount, measurement, ingredients = extract_ingredients(cur_line.text_to_colors)
-        print('getting cleaned line:', cur_line.cline_id)
-        cur_cleaned_line = CleanedLine.query.filter_by(id=cur_line.cline_id).first_or_404()
-        # check if there is more than one raw line that points to this cleaned line
-        # TODO: modify cleaned line code to check if there is more than one raw line (and split them if necessary)
-        print(cur_cleaned_line)
-        cur_cleaned_line.amount = amount
-        cur_cleaned_line.measurement = measurement
-        cur_cleaned_line.ingredient = ingredient
 
-        db.session.commit()
+        # check if there are the same number of ingredients
+        if len(ingredients) == len(old_ingredients):
+            # we still have the same number of ingredients
+            cline_to_change.ingredient = ingredients[cline_to_change.rawline_index]
+
+        elif len(ingredients) < len(old_ingredients):
+            # we have combined ingredients
+
+            cline_index = cline_to_change.rawline_index
+            if cline_index == 0:
+                #beginning of list, combination can only be right
+                cline_to_change.ingredient = ingredients[cline_to_change.rawline_index]
+
+                pass
+
+            elif cline_index > len(ingredients):
+                # end of list, combination can only be left
+                pass
+
+
+
+
+            # get all clines
+
+            # need to figure out what was combined
+
+            # remove rawline from other cline
+
+            pass
+        elif len(ingredients) > len(old_ingredients):
+            # we have split ingredients
+            pass
+
+        # change the ingredient to the new value on cur_line
+
+
+
 
     return jsonify(new_colors)
 

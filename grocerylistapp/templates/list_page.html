@@ -8,7 +8,7 @@
 
 {% block content %}
     <div class="row">
-      <div class="col-md-6">
+      <div class="col-md-4">
         <h1> Recipes </h1>
           <div id="recipe-list" class="list-group">
               {% for recipe in recipe_list %}
@@ -26,8 +26,12 @@
           {% endif %}
       </div>
 
-      <div class="col-md-6 my-3">
-          <div class="edit-label" id="complist-name" contenteditable>{{ comp_list.name }}</div>
+      <div class="col-md-8 my-3">
+          <div class="card">
+              <div class="card-body">
+                <div class="card p-1 shadow title-bg">
+                  <div class="edit-label w-100 text-center" id="complist-name" contenteditable><h1>{{ comp_list.name }}</h1></div>
+                </div>
           {% if current_user.temporary %}
           <div>
               <p class="font-italic text-muted">This is a temporary guest list. To make your list permanent (and create additional lists), please
@@ -40,23 +44,25 @@
               <p class="font-italic text-muted">Created by {{creator.username}}</p>
           </div>
           {% endif %}
-          <div id="list-tool-panel">
+          <div class="my-2" id="list-tool-panel">
               <button data-toggle="modal" data-target="#printModal" class="btn btn-info">Print</button>
               <button data-toggle="modal" data-target="#exportModal" class="btn btn-info">Email</button>
               {% if not user_is_owner %}
               <a href="{{url_for('checklist.copy_list', hex_name=comp_list.hex_name)}}" class="btn btn-success">Create Copy</a>
               {% endif %}
           </div>
-            <div class="list-group list-group-root " id="compiled-list">
+            <div class="list-group-root" id="compiled-list">
                 {% for line in list_lines %}
-                <div id="full-{{line.hex_id}}" class="full-line">
-                    <label id="label-{{line.hex_id}}" class="recipe-label">
+                <div id="full-{{line.hex_id}}" class="full-line my-3 row">
+                    <div class="col-2 col-sm-1">
+                    <label id="label-{{line.hex_id}}" class="recipe-label mr-1">
                         <input id="checkbox-{{line.hex_id}}" type="checkbox"{{line.checked}}{% if not user_is_owner%}disabled{% endif %}>
-                        <span class="recipe-checkbox"></span>
+                        <span class="recipe-checkbox shadow-sm"></span>
                     </label>
-                    <div id="line-{{line.hex_id}}" class="recipe-line">
-                    <a href="#{{line.ingredient_id}}" class="list-group-item list-group-item-action recipe-list" data-toggle="collapse" aria-expanded="false" role="button">
-                        <button id=drag-{{line.hex_id}} class="drag-button" {% if not user_is_owner%}disabled{% endif %}>&#8801</button>
+                    </div>
+
+                    <div id="line-{{line.hex_id}}" class="recipe-line card p-1 col-10 col-sm-11 shadow-sm">
+                        <a href="#{{line.ingredient_id}}" class="recipe-list ml-2" data-toggle="collapse" aria-expanded="false" role="button">
                         <span class="ingredient-name">
                             {% for dot in line.color_dots %}
                             <span class="dot top-level d-none" style="background-color:{{dot}}"></span>
@@ -68,20 +74,12 @@
                         {% endif %}
                     </a>
                     {% if line.raw_lines %}
-                    <div class="list-group collapse" id="{{line.ingredient_id}}">
+                    <div class="collapse" id="{{line.ingredient_id}}">
                         {% for raw_line in line.raw_lines %}
-                            <div class="list-group-item list-flex" data-toggle="collapse" id="{{raw_line.hex_id}}">
-                                <div class="recipe-info">
-                                    <span class="dot" style="background-color:{{raw_line.recipe.hex_color}}"></span>
-                                    <div class="recipe-div">"{{raw_line.full_text}}"</div>
-                                    <div class="recipe-name recipe-div">{{raw_line.recipe.name}}</div>
-                                </div>
-                                {% if user_is_owner %}
-                                <div class="button-panel recipe-div">
-                                    <button class="edit-button">Edit</button>
-                                </div>
-                                {% endif %}
-                            </div>
+                            <button class="recipe-info my-1 p-1 shadow-sm w-100 text-left" data-toggle="collapse" id="{{raw_line.hex_id}}">
+                                <span class="dot" style="background-color:{{raw_line.recipe.hex_color}}"></span>
+                                <div class="recipe-div ">"{{raw_line.full_text}}"</div>
+                            </button>
                         {% endfor %}
                         </div>
                         {% endif %}
@@ -96,9 +94,10 @@
 
             <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteModal"> Delete </button>
           {% endif%}
+          </div>
       </div>
     </div>
-
+</div>
 
 <!-- Modal Delete -->
 <div class="modal fade" tabindex="-1" id="deleteModal" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">

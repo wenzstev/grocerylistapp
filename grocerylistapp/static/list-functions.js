@@ -1,72 +1,60 @@
 
 
-function clean_line(jsonData, place_to_append){
+function clean_line(jsonData, clean_line){
+    console.log("cleaning line")
+    console.log(clean_line)
+    clean_line.children().hide()
+    clean_line.addClass('raw-line') // add the raw line class so that create_ingredient_groups can find it
 
-    console.log(place_to_append)
-    place_to_append.children('.recipe-info, .button-panel').hide()
-
-    var compiled_list = $('#compiled-list')
-    place_to_append.append("<div id='clean-line' class='btn-group'></div>")
-
-    var clean_line = $("#clean-line")
+    clean_line.append("<span></span>")
 
     var word_buttons = []
     for (var i in jsonData['parsed_line']){
-      clean_line.append("<button class='" + jsonData['parsed_line'][i][1] + " word-button'>" + jsonData['parsed_line'][i][0] + "</button>")
+      clean_line.append("<button class='" + jsonData['parsed_line'][i][1] + " word-button float-none'>" + jsonData['parsed_line'][i][0] + "</button>")
     }
 
-    $("#add-line-submit").toggleClass("hidden")
-    $("#add-line-input").toggleClass("hidden")
+    clean_line.append("<span></span>")
 
-    clean_line.append("<div id='commit-new-line' class='button-panel recipe-div'></div>")
+    create_ingredient_groups()
 
-    $("#commit-new-line").append("<button id='commit-button' class='edit-button'>Commit</button>")
-
-    $("#commit-button").on('click', function(){
-      window.location.href=$SCRIPT_ROOT + '/list/' + $LIST_HEX
-    })
-
-    // TODO: refactor so there isn't reused javascript like this
-    var b_dict = {
-      'btn-base': 'btn-ingredient',
-      'btn-ingredient': 'btn-measurement',
-      'btn-measurement': 'btn-amount',
-      'btn-amount': 'btn-base',
-    }
     var patt = /btn-[\w]+/  // regex pattern to find button class
 
     $('.word-button').click(function(){
+
       var btn_class = $( this ).attr("class").match(patt)[0]
 
       $( this ).toggleClass(btn_class)
       $( this ).toggleClass(b_simplified[btn_class])
 
-    var children = clean_line.children('.word-button')
+      var children = clean_line.find('.word-button')
 
-    var button_colors = []
+      var button_colors = []
 
-    for (var i = 0; i < children.length; i++){
-      button_text = $(children[i]).text()
-      button_color = $(children[i]).attr('class').match(patt)[0]
-      button_colors.push([button_text, button_color])
-    }
+      $(children).each(function(index){
+        button_text = $( this ).text()
+        button_color = $( this ).attr('class').match(patt)[0]
+        button_colors.push([button_text, button_color])
+      })
 
-    console.log(jsonData)
 
-    var data = {
-      'hex_id': jsonData['hex_id'],
-      'text_to_colors': JSON.stringify(button_colors),
-    }
-
-    $.ajax({
-      type: 'POST',
-      url: $SCRIPT_ROOT + "/line/set_color",
-      data: data,
-      dataType: 'json',
-      success: function(jsonData){
-        console.log('ajax successful!')
+      var data = {
+        'rawline_id': jsonData['hex_id'],
+        'text_to_colors': JSON.stringify(button_colors),
+        'cleanedline_id': $( this ).parents('.recipe-line').attr('id').slice(5,16),
       }
-    })
+
+      curr_button = $( this )
+
+      $.ajax({
+        type: 'POST',
+        url: $SCRIPT_ROOT + "/line/set_color",
+        data: data,
+        dataType: 'json',
+        success: function(jsonData){
+          console.log('ajax successful!')
+          update_ingredient_groups(curr_button)
+        }
+      })
   })
 
 }
@@ -130,16 +118,12 @@ $(document).ready(function(){
 
   })
 
-  $('.edit-button').on("click", function () {
+  $('.recipe-info').on("click", function () {
 
-    var line = $( this ).parents(".list-flex")
-    console.log(line)
-    var line_text = line.find('.recipe-line').text()
-    console.log(line_text)
-
+    var line = $( this )
 
     var data = {
-      'hex_id': line.attr('id')
+      'hex_id': $( this ).attr('id')
     }
 
     console.log(data)
@@ -153,11 +137,24 @@ $(document).ready(function(){
         console.log('success!')
         console.log(jsonData)
         clean_line(jsonData, line)
+        line.prop("disabled", true)
       }
     })
   })
 
-  $('.edit-label').focusout(change_recipe_name)
+  function change_list_name(){
+    return change_name('list', $LIST_HEX, $(this).text())
+  }
+
+  $('.edit-label').focusout(change_list_name)
+  $('.edit-label').keypress(function(event){
+    console.log(event)
+    if (event.keyCode == '13'){
+      event.preventDefault()
+      change_list_name()
+      $( this ).blur()
+    }
+  })
 
   $('#rename-list-button').on("click", function(){
     var complist_div = $("#complist-name-div")

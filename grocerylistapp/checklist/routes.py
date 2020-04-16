@@ -114,7 +114,8 @@ def delete(hex_name):
 @checklist.route('/list/rename', methods=['GET', 'POST'])
 @owner_only
 def change_name():
-    list_to_rename = CompiledList.query.filter_by(hex_name=request.form.get('list', '', type=str)).first_or_404()
+    print(request.form)
+    list_to_rename = CompiledList.query.filter_by(hex_name=request.form.get('id', '', type=str)).first_or_404()
     list_to_rename.name = request.form.get('name', 'ERROR', type=str)
     db.session.commit()
 
