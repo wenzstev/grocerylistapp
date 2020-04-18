@@ -53,7 +53,7 @@
           </div>
             <div class="list-group-root" id="compiled-list">
                 {% for line in list_lines %}
-                <div id="full-{{line.hex_id}}" class="full-line my-3 row">
+                <div id="full-{{line.hex_id}}-{{line.ingredient_color}}" class="full-line my-3 row">
                     <div class="col-2 col-sm-1">
                     <label id="label-{{line.hex_id}}" class="recipe-label mr-1">
                         <input id="checkbox-{{line.hex_id}}" type="checkbox"{{line.checked}}{% if not user_is_owner%}disabled{% endif %}>

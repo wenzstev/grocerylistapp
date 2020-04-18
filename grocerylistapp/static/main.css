@@ -102,13 +102,9 @@ a[data-toggle="collapse"] {
   display: block;
 }
 
-.word-button {
-  margin: 0;
-  font-size: 20px;
-}
+
 
 .btn-ingredient {
-  background-color: coral;
   color: white;
   font-style: normal;
   cursor: pointer;
@@ -126,9 +122,6 @@ a[data-toggle="collapse"] {
   border-radius: 10px;
 }
 
-.ingredient-group {
-
-}
 
 
 .btn-amount {
@@ -273,8 +266,41 @@ a[data-toggle="collapse"] {
   background-color: lightgray;
 }
 
+.color-label {
+
+}
+
+.color-label input:checked ~ .color-radio {
+  border: 5px solid lightgray;
+}
+
+.color-label input {
+  opacity: 0;
+  height: 0;
+  width: 0;
+  position: absolute;
+  cursor: pointer;
+}
+
+.color-radio {
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  border-radius: 25%;
+}
+
+.color-radio:hover{
+  border: 3px solid lightgray;
+}
+
 .strikethrough{
   text-decoration: line-through;
+}
+
+.sticky {
+  position: fixed;
+  top: 5px;
+  z-index: 5;
 }
 
 #rename-list-button {
@@ -379,4 +405,16 @@ a[data-toggle="collapse"] {
 
 .title-bg:hover{
   background: #faebd7;
+}
+
+.ing-1 {
+  background-color: coral;
+}
+
+.ing-2 {
+  background-color: darkorchid;
+}
+
+.ing-3 {
+  background-color: forestgreen;
 }

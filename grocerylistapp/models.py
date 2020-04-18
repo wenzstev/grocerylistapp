@@ -68,6 +68,7 @@ class CleanedLine(db.Model):
     checked = db.Column(db.Boolean, default=False)  # whether or not the item is checked off the list
     comp_list = db.Column(db.Integer, db.ForeignKey('compiled_list.id'))
     rawline_index = db.Column(db.Integer) # the index of which ingredient it is in the raw line
+    ingredient_color = db.Column(db.String) # the class color of the ingredient of the line
 
     def __repr__(self):
         return f"{self.ingredient} in list {self.comp_list}"

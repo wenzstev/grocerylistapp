@@ -9,6 +9,22 @@
     </div>
 
     <div class="card-body p-1 recipe-card-body">
+        <div id="ingredient-selector" class="p-2 mx-1 bg-info rounded align-middle row">
+            <span class="color-instructions col-auto text-light">Ingredient selector: </span>
+            <label class="color-label mr-1 form-check-inline col-auto">
+                <input type="radio" name="color" value="ing-1" checked>
+                <span class="color-radio shadow-sm" style="background: coral"></span>
+            </label>
+            <label class="color-label mr-1 form-check-inline col-auto">
+                <input type="radio" name="color" value="ing-2">
+                <span class="color-radio shadow-sm" style="background: darkorchid"></span>
+            </label>
+            <label class="color-label mr-1 form-check-inline col-auto">
+                <input type="radio" name="color" value="ing-3">
+                <span class="color-radio shadow-sm" style="background: forestgreen"></span>
+            </label>
+        </div>
+
         <ul class="p-2">
         {% for line in rlist_lines %}
             <li class="p-2 m-2 shadow-sm recipe-list-item">

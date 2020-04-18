@@ -37,6 +37,8 @@ class CompiledIngredientLine:
 
         self.raw_lines = [LineToPass(line) for line in self.raw_lines]
 
+        self.ingredient_color = cleaned_line.ingredient_color
+
         self.color_dots = set()
         for raw_line in self.raw_lines:
             recipe = RecipeList.query.filter_by(id=raw_line.list_id).first()

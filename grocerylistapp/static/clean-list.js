@@ -1,6 +1,23 @@
 
 
 $(function(){
+  var selector = $("#ingredient-selector")
+  var offset = selector.offset().top
+
+
+  $( window ).scroll(function(){
+    var win_offset = $( window ).scrollTop()
+
+    if (win_offset >= offset){
+      selector.addClass("sticky")
+    } else {
+      selector.removeClass("sticky")
+    }
+
+  })
+
+
+
   var word_buttons = $('.word-button')
 
   var b_cycle = ['btn-base', 'btn-ingredient', 'btn-amount', 'btn-measurement']
@@ -12,55 +29,25 @@ $(function(){
     'btn-amount': 'btn-base',
   }
 
+  var b_ings = ["ing-1", "ing-2", "ing-3"]
 
-  create_ingredient_groups()
+  $(".raw-line").each(function(){
+    console.log($(this))
+    create_ingredient_groups($(this))
+  })
+
+
+  var current_color = "ing-1"
+
+  // get the current color we're painting with
+  $("input[name='color']").click(function(){
+    current_color = $("input[name='color']:checked").val()
+    console.log(current_color)
+  })
+
 
   word_buttons.click(function(){
-
-    var patt = /btn-[\w]+/  // regex pattern to find button class
-
-    var btn_class = $( this ).attr("class").match(patt)[0]
-
-
-    $( this ).toggleClass(btn_class)
-    $( this ).toggleClass(b_simplified[btn_class])
-
-
-
-    var line = $( this ).parents('.raw-line')
-    var line_id = line.attr('id')
-
-    var children = line.find('button') // don't get the empty divs
-    console.log(children)
-
-    var button_colors = []
-
-    for (var i = 0; i < children.length; i++){
-      button_text = $(children[i]).text()
-      console.log(button_text)
-      button_color = $(children[i]).attr('class').match(patt)[0]
-      console.log(button_color)
-      button_colors.push([button_text, button_color])
-    }
-
-
-
-    var data = {'hex_id': line_id,
-                'text_to_colors': JSON.stringify(button_colors)}
-    console.log(data)
-
-    var button = $(this)
-
-    $.ajax({
-      type: 'POST',
-      url: $SCRIPT_ROOT + '/line/set_color',
-      data: data,
-      dataType: 'json',
-      success: function(jsonData){
-        console.log(jsonData)
-        update_ingredient_groups(button)
-      }
-    })
+    send_line_data($(this), current_color)
   });
 
   $('#recipe-title').click(function(){
@@ -88,6 +75,5 @@ $(function(){
     $('body').append(form)
     form.submit()
   })
-
 
 });

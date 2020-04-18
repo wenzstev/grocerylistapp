@@ -1,8 +1,7 @@
 
 
 function clean_line(jsonData, clean_line){
-    console.log("cleaning line")
-    console.log(clean_line)
+
     clean_line.children().hide()
     clean_line.addClass('raw-line') // add the raw line class so that create_ingredient_groups can find it
 
@@ -15,46 +14,14 @@ function clean_line(jsonData, clean_line){
 
     clean_line.append("<span></span>")
 
-    create_ingredient_groups()
+    create_ingredient_groups(clean_line)
 
     var patt = /btn-[\w]+/  // regex pattern to find button class
 
     $('.word-button').click(function(){
+      var line_color = $( this ).parents(".full-line").attr("id").slice(17, 22) // gives us the color to use
+      send_line_data($(this), line_color)
 
-      var btn_class = $( this ).attr("class").match(patt)[0]
-
-      $( this ).toggleClass(btn_class)
-      $( this ).toggleClass(b_simplified[btn_class])
-
-      var children = clean_line.find('.word-button')
-
-      var button_colors = []
-
-      $(children).each(function(index){
-        button_text = $( this ).text()
-        button_color = $( this ).attr('class').match(patt)[0]
-        button_colors.push([button_text, button_color])
-      })
-
-
-      var data = {
-        'rawline_id': jsonData['hex_id'],
-        'text_to_colors': JSON.stringify(button_colors),
-        'cleanedline_id': $( this ).parents('.recipe-line').attr('id').slice(5,16),
-      }
-
-      curr_button = $( this )
-
-      $.ajax({
-        type: 'POST',
-        url: $SCRIPT_ROOT + "/line/set_color",
-        data: data,
-        dataType: 'json',
-        success: function(jsonData){
-          console.log('ajax successful!')
-          update_ingredient_groups(curr_button)
-        }
-      })
   })
 
 }
@@ -126,7 +93,6 @@ $(document).ready(function(){
       'hex_id': $( this ).attr('id')
     }
 
-    console.log(data)
 
     $.ajax({
       type: 'POST',
@@ -134,8 +100,6 @@ $(document).ready(function(){
       data: data,
       dataType: 'json',
       success: function(jsonData){
-        console.log('success!')
-        console.log(jsonData)
         clean_line(jsonData, line)
         line.prop("disabled", true)
       }

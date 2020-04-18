@@ -1,3 +1,4 @@
+
 function change_name(type, id, new_name){
     $(this).attr('spellcheck', 'false')
 
@@ -23,29 +24,138 @@ function change_name(type, id, new_name){
 
 // link ingredients into a button-group
 var button_group = "<div class='btn-group ingredient-group d-inline align-baseline float-none'></div>"
+var ing_reg = /ing-[\d]/
 
-function create_ingredient_groups(){
-  $(".raw-line").each(function(){  // iterate through each line
+function create_ingredient_groups(line) {
     current_group = $(button_group) // create button group div
-    current_line = $(this)
-    $( this ).children().each(function(){
+    current_line = line
+    var cur_group_color = ""
+    line.children().each(function(){
       var next = $(this).next()
       if ($( this ).hasClass('btn-ingredient')){
-        $(this).appendTo(current_group)
-        if (next.length == 0){
+        var button_reg = $( this ).attr("class").match(ing_reg)
+        if(button_reg != null){
+          var button_color = button_reg[0]
+          if (button_color == cur_group_color) {
+            // still in same group
+            $(this).appendTo(current_group)
+          } else {
+              if (current_group.children().length > 0){
+                // new button group, insert old and reset
+                current_group.insertBefore($(this))
+                cur_group_color = button_color
+                current_group = $(button_group)
+                current_group.append($(this))
+              } else {
+                // first button of new group
+                current_group.append($(this))
+                cur_group_color = button_color
+              }
+          }
+        }
+
+        if (next.length == 0){ // end of line
           current_line.append(current_group)
         }
       }
       else if (current_group.children().length > 0){
         // end of button group, insert into line
-        console.log("time to insert")
         current_group.insertBefore($(this))
         current_group = $(button_group) // reset group
       }
     })
-  });
 }
 
+function strip_groups(line){
+  console.log(line)
+  line.children(".btn-group").each(function(){
+    $(this).children().unwrap()
+  })
+}
+
+function send_line_data(button, current_color){
+  var patt = /btn-[\w]+/  // regex pattern to find button class
+
+  var btn_class = button.attr("class").match(patt)[0]
+
+  var ing = /ing-[\d]/
+  var button_reg = button.attr("class").match(ing)
+
+  if (button_reg != null){
+    if (button_reg[0] == current_color){
+      // toggle out of group
+      button.toggleClass(button_reg[0])
+      button.toggleClass(btn_class)
+      button.toggleClass(b_simplified[btn_class])
+    } else {
+      // toggle into new group
+      button.addClass(current_color)
+      button.removeClass(button_reg[0])
+    }
+  } else {
+    button.addClass(current_color)
+    button.toggleClass(btn_class)
+    button.toggleClass(b_simplified[btn_class])
+  }
+
+
+  var line = button.parents('.raw-line')
+  var line_id = line.attr('id')
+
+  var children = line.find('button') // don't get the empty divs
+
+  var button_colors = []
+
+  for (var i = 0; i < children.length; i++){
+    button_text = $(children[i]).text()
+    var child_ingredient_reg = $( children[i] ).attr("class").match(ing)
+    var button_ingredient = ""
+    if (child_ingredient_reg != null){
+      button_ingredient = " " + child_ingredient_reg[0]
+    }
+
+    button_color = $(children[i]).attr('class').match(patt)[0] + button_ingredient
+
+    button_colors.push([button_text, button_color])
+  }
+
+
+
+  var data = {'rawline_id': line_id,
+              'text_to_colors': JSON.stringify(button_colors)}
+
+  // check if we have a cleaned line and if so add it
+  line_id = $( button ).parents('.full-line').attr('id')
+  if (line_id != null){
+    console.log(line_id.slice(5, 16))
+    data['cleanedline_id'] = line_id.slice(5, 16)
+  }
+  console.log(line_id)
+
+  $.ajax({
+    type: 'POST',
+    url: $SCRIPT_ROOT + '/line/set_color',
+    data: data,
+    dataType: 'json',
+    success: function(jsonData){
+      strip_groups(line)
+      create_ingredient_groups(line)
+      console.log(jsonData)
+      if (jsonData['changed_lines'] != null){
+        console.log(jsonData['changed_lines'])
+        // we have lines to change
+        for (var changed_line in jsonData['changed_lines']){
+          console.log(changed_line)
+          console.log(jsonData['changed_lines'][changed_line])
+          // iterate through and change the values
+          $("#line-" + changed_line).find(".ingredient-name").text(jsonData['changed_lines'][changed_line])
+        }
+      }
+    }
+  })
+}
+
+// currently unused
 function update_ingredient_groups(button){
   console.log(button.text())
 
