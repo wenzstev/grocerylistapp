@@ -17,7 +17,7 @@ function change_name(type, id, new_name){
       data: data,
       dataType: 'json',
       success: function(jsonData){
-        console.log('new name is ' + jsonData['name'])
+        console.log('new name is ' + jsonData['new_name'])
       }
     })
 }
@@ -124,6 +124,11 @@ function send_line_data(button, current_color){
   var data = {'rawline_id': line_id,
               'text_to_colors': JSON.stringify(button_colors)}
 
+  if (typeof $LIST_HEX !== 'undefined'){
+    // we're on a list page
+    data['list_id'] = $LIST_HEX
+  }
+
   // check if we have a cleaned line and if so add it
   line_id = $( button ).parents('.full-line').attr('id')
   if (line_id != null){
@@ -141,15 +146,67 @@ function send_line_data(button, current_color){
       strip_groups(line)
       create_ingredient_groups(line)
       console.log(jsonData)
-      if (jsonData['changed_lines'] != null){
-        console.log(jsonData['changed_lines'])
-        // we have lines to change
-        for (var changed_line in jsonData['changed_lines']){
-          console.log(changed_line)
-          console.log(jsonData['changed_lines'][changed_line])
-          // iterate through and change the values
-          $("#line-" + changed_line).find(".ingredient-name").text(jsonData['changed_lines'][changed_line])
+      var type = jsonData["type"]
+      if (type == "changed") {
+        // change existing line
+        console.log(jsonData["change"])
+        for (var line_index in jsonData["change"]){
+          current_line = jsonData["change"][line_index]
+          console.log(current_line[0] + " " + current_line[1])
+          $("#line-" + current_line[0]).find(".ingredient-name").text(current_line[1])
         }
+      } else if (type == "moved"){
+        // moving raw line to a new cleaned line
+        console.log("moving raw line")
+        console.log(jsonData["change"])
+        for (var line_index in jsonData["change"]){
+          lines_to_change = jsonData["change"][line_index]
+          console.log(lines_to_change)
+          rawline_clicked_on = $("#" + lines_to_change[0])
+          cleanedline_clicked_on = rawline_clicked_on.parents('.full-line')
+          line_to_move = $("#line-" + lines_to_change[1])
+
+          // 1. move the rawline div to the new parent
+          rawline_clicked_on.prependTo(line_to_move.children('.collapse'))
+          line_to_move.children('.collapse').addClass('show')
+
+          // 2. insert the new parent into where the old cleanedline was
+          cleanedline_clicked_on.after(line_to_move.parent())
+
+        }
+      } else if (type == "create"){
+        // creating a new cleaned line
+        console.log("creating new line")
+        console.log(jsonData["change"])
+        for (var index in jsonData["change"]){
+          lines_to_change = jsonData["change"][index]
+          rawline_clicked_on = $("#" + lines_to_change[0])
+          cleanedline_to_create = lines_to_change[1]
+          // new ajax request to get the html for the new line
+          $.ajax({
+            type: 'POST',
+            url: $SCRIPT_ROOT + '/line/build',
+            data: {'line': cleanedline_to_create},
+            dataType: 'html',
+            success: function(htmlData){
+              new_line = $(htmlData)
+              console.log(new_line)
+              new_line.find('.remove-button').on('click', delete_line)
+              new_line.find('.recipe-info').on('click', get_line_data)
+              new_line.find('input').on("change", cross_out_line)
+
+              new_line.insertBefore(rawline_clicked_on.parents('.full-line'))
+              new_line.find('.recipe-info').replaceWith(rawline_clicked_on)
+            }
+          })
+        }
+      }
+
+      // check for divs to delete
+      if (jsonData["delete"] !== 'undefined'){
+        console.log("need to delete")
+        line_to_delete = $("#line-" + jsonData["delete"]).parent()
+        line_to_delete.remove()
       }
     }
   })

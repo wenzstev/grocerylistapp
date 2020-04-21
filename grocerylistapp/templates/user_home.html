@@ -6,6 +6,12 @@
 {% if user_lists|length < 1%}
 <h6 class="text-muted font-italic text-light">You haven't made any lists yet! Click the card below to get started.</h6>
 {% endif %}
+        <div class="card recipe-card my-3">
+            <div class="card-body">
+                <h5><a href="{{url_for('checklist.create_list_page')}}" class="stretched-link card-title">Create a New Grocery List</a></h5>
+                <p class="card-subtitle mb-2 text-muted font-italic">Create a new grocery list via url or manually.</p>
+            </div>
+        </div>
 <div class="card-deck">
 {% for list in user_lists %}
         <div class="card recipe-card my-3">
@@ -32,12 +38,7 @@
         <div class="w-100 d-none d-xl-block"><!-- wrap every 5 on extra large --></div>
     {% endif %}
 {% endfor %}
-        <div class="card recipe-card my-3">
-            <div class="card-body">
-                <h5><a href="{{url_for('checklist.create_list_page')}}" class="stretched-link card-title">Create a New Grocery List</a></h5>
-                <p class="card-subtitle mb-2 text-muted font-italic">Create a new grocery list via url or manually.</p>
-            </div>
-        </div>
+
 </div>
 
 {% endblock content %}

@@ -4,13 +4,33 @@ from flask_login import current_user
 from grocerylistapp import db
 
 from grocerylistapp.models import RecipeList, RawLine, CompiledList, CleanedLine
-from grocerylistapp.forms import CustomRecipeForm
-from grocerylistapp.constructors import create_recipe_from_text, LineToPass
+from grocerylistapp.forms import CustomRecipeForm, RecipeURLForm
+from grocerylistapp.constructors import create_recipe_from_text, LineToPass, create_recipe_from_url
 from grocerylistapp.nlp import extract_ingredients
 
 from grocerylistapp.recipe.forms import RecipeCleanForm
 
 recipe = Blueprint('recipe', __name__)
+
+
+@recipe.route('/list/<string:list_name>/add_recipe', methods=['GET', 'POST'])
+def add_recipe(list_name):
+    current_list = CompiledList.query.filter_by(hex_name=list_name).first_or_404()
+
+    url_form = RecipeURLForm(prefix='recipe-url')
+    custom_form = CustomRecipeForm(prefix='recipe-custom')
+
+    if url_form.validate_on_submit():
+        new_recipe = create_recipe_from_url(url_form.url.data)
+        return redirect(url_for('recipe.clean_recipe', list_name=list_name, new_recipe=new_recipe.hex_name))
+
+    if custom_form.validate_on_submit():
+        new_recipe = create_recipe_from_text("Untitled Recipe", custom_form.recipe_lines.data)
+        new_recipe.complist = current_list
+        return redirect(url_for('recipe.clean_recipe', list_name=current_list.hex_name, new_recipe=new_recipe.hex_name))
+
+
+    return render_template('add_recipe_lander.html', url_form=url_form, custom_form=custom_form, list=current_list)
 
 
 @recipe.route('/list/<string:list_name>/clean_recipe/<string:new_recipe>', methods=['GET', 'POST'])
@@ -84,7 +104,7 @@ def clean_recipe(list_name, new_recipe):
 
 @recipe.route('/recipe/rename', methods=['POST'])
 def rename_recipe():
-    recipe_to_rename = RecipeList.query.filter_by(hex_name=request.form.get('recipe_id', '', type=str)).first_or_404()
+    recipe_to_rename = RecipeList.query.filter_by(hex_name=request.form.get('id', '', type=str)).first_or_404()
     recipe_to_rename.name = request.form.get('name', recipe.name, type=str)
     db.session.commit()
 

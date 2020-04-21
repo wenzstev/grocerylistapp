@@ -1,10 +1,10 @@
 import json, secrets, random, requests
 
-from bs4 import BeautifulSoup
 
 from grocerylistapp import db
 from grocerylistapp.models import RecipeList, CompiledList, RawLine, CleanedLine, User
 from grocerylistapp.nlp import color_entities_in_line
+from grocerylistapp.scraper import get_title, get_recipe_info
 
 
 # class that takes the db Line object and turns it into a python class to pass to the template
@@ -61,7 +61,6 @@ class ChecklistCard:
         self.leftover_recipes = len(self.recipes) - len(self.sample_recipes)
 
 
-
 # creates a new recipe
 def create_recipe(title):
     random_hex = secrets.token_urlsafe(8)
@@ -74,10 +73,12 @@ def create_recipe(title):
 
 
 def create_recipe_from_url(url):
-    rlist = create_recipe(get_title(url))
+    recipe_info = get_recipe_info(url)  # TODO: possibly refactor code so that get_recipe_lines is here too
+
+
+    rlist = create_recipe(recipe_info['title'])
     rlist.recipe_url = url
-    recipe_lines = get_recipe_lines(url)  # TODO: possibly refactor code so that get_recipe_lines is here too
-    for num, line in enumerate(recipe_lines):
+    for num, line in enumerate(recipe_info['recipe_lines']):
         recipe_colors = color_entities_in_line(line)
         recipe_line = RawLine(full_text=line, rlist=rlist, text_to_colors=recipe_colors)
         db.session.add(recipe_line)
@@ -109,23 +110,6 @@ def create_recipe_from_text(title, recipe_text):
     db.session.commit()
 
     return recipe
-
-
-def get_recipe_lines(url):
-    res = requests.get(url)
-    soup = BeautifulSoup(res.text, 'lxml')
-
-    ingredient_classes = soup.find_all("span", class_="recipe-ingred_txt added")
-    ingredient_lines = [line.get_text() for line in ingredient_classes]
-
-    return ingredient_lines
-
-
-def get_title(url):
-    res = requests.get(url)
-    soup = BeautifulSoup(res.text, 'lxml')
-
-    return soup.title.string
 
 
 def create_guest_user():

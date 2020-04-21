@@ -1,0 +1,30 @@
+<div id="full-{{line.hex_id}}-{{line.ingredient_color}}" class="full-line my-3 mr-1 row">
+                    <div class="col-2 col-sm-1">
+                    <label id="label-{{line.hex_id}}" class="recipe-label mr-1">
+                        <input id="checkbox-{{line.hex_id}}" type="checkbox">
+                        <span class="recipe-checkbox shadow-sm"></span>
+                    </label>
+                    </div>
+
+                    <div id="line-{{line.hex_id}}" class="recipe-line card p-1 col-10 col-sm-11 shadow-sm">
+                        <a href="#{{line.ingredient_id}}" class="recipe-list ml-2" data-toggle="collapse" aria-expanded="false" role="button">
+                        <span class="ingredient-name">
+                            {% for dot in line.color_dots %}
+                            <span class="dot top-level d-none" style="background-color:{{dot}}"></span>
+                            {% endfor %}
+                            {{ line.ingredient }}
+                        </span>
+                        <button id="delete-{{line.hex_id}}" class="remove-button">&#10005</button>
+                        </a>
+                    {% if line.raw_lines %}
+                    <div class="collapse show" id="{{line.ingredient_id}}">
+                        {% for raw_line in line.raw_lines %}
+                            <button class="recipe-info my-1 p-1 shadow-sm w-100 text-left" data-toggle="collapse" id="{{raw_line.hex_id}}">
+                                <span class="dot" style="background-color:{{raw_line.recipe.hex_color}}"></span>
+                                <div class="recipe-div ">"{{raw_line.full_text}}"</div>
+                            </button>
+                        {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+</div>

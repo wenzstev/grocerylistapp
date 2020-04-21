@@ -42,7 +42,7 @@ def extract_ingredients(color_string,
                 else:
                     # new, adjacent ingredient
                     print("appending ingredient: ", current_ingredient)
-                    ingredients.append((current_ingredient, ingredient_class))
+                    ingredients.append((current_ingredient.strip(), ingredient_class))
                     current_ingredient = word + ' '
                     ingredient_class = colors[1]
         else:  # not in ingredient
@@ -50,7 +50,7 @@ def extract_ingredients(color_string,
             if len(current_ingredient) > 0:
                 # we ended an ingredient, need to add it
                 print("appending ingredient: ", current_ingredient)
-                ingredients.append((current_ingredient, ingredient_class))
+                ingredients.append((current_ingredient.strip(), ingredient_class))
                 current_ingredient = ''
                 ingredient_class = ''  # reset the class
 
@@ -58,7 +58,7 @@ def extract_ingredients(color_string,
         print("end of line")
         print("appending ingredient: ", current_ingredient)
 
-        ingredients.append((current_ingredient, ingredient_class))
+        ingredients.append((current_ingredient.strip(), ingredient_class))
 
     print(ingredients)
 

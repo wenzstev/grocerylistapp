@@ -26,13 +26,6 @@ def user_homepage():
 def register():
     register_form = RegistrationForm()
 
-    if current_user.is_authenticated:
-        if current_user.temporary:
-            guest_list = CompiledList.query.filter_by(user_id=current_user.id).all()
-            return render_template('register.html', register_form=register_form, grocery_lists=guest_list)
-        else:
-            return redirect(url_for('main.home'))
-
     if register_form.validate_on_submit():
         print('here')
         hashed_password = bcrypt.generate_password_hash(register_form.password.data).decode('utf-8')
@@ -58,6 +51,14 @@ def register():
             return render_template('register.html', register_form=register_form)
 
         return redirect(url_for('account.login'))
+
+
+    if current_user.is_authenticated:
+        if current_user.temporary:
+            guest_list = CompiledList.query.filter_by(user_id=current_user.id).all()
+            return render_template('register.html', register_form=register_form, grocery_lists=guest_list)
+        else:
+            return redirect(url_for('main.home'))
 
     return render_template('register.html', register_form=register_form)
 

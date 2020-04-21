@@ -1,0 +1,32 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<h1 class="mt-3">Add Recipe</h1>
+<h5 class="text-muted font-italic">Add a recipe to "{{list.name}}". You can enter the url of the recipe, or paste/type the lines below.</h5>
+
+<div class="card my-3">
+    <div class="card-body">
+        <h5>Add by URL</h5>
+        <form method="POST" action="">
+            {{ url_form.hidden_tag() }}
+            <div class="form-group">
+                {{ url_form.url(class='form-control') }}
+            </div>
+            {{ url_form.submit(class='btn btn-primary') }}
+        </form>
+    </div>
+</div>
+<div class="card my-3">
+    <div class="card-body">
+        <h5>Add by Copy/Paste</h5>
+        <form method="POST" action="">
+            {{ custom_form.hidden_tag() }}
+            <div class="form-group">
+                {{ custom_form.recipe_lines(class='form-control') }}
+            </div>
+            {{ custom_form.submit(class='btn btn-primary') }}
+        </form>
+    </div>
+</div>
+
+{% endblock content %}

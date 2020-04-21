@@ -52,6 +52,7 @@ class RawLine(db.Model):
     full_text = db.Column(db.String(100), nullable=False)  # the text of the line
     list_id = db.Column(db.Integer, db.ForeignKey('recipe_list.id'))  # the id of the list for the line
     text_to_colors = db.Column(db.String)
+    #change to back_populates?
     cleaned_lines = db.relationship('CleanedLine', secondary=line_assocs, backref=db.backref('raw_lines', lazy='dynamic'))
 
     def __repr__(self):
@@ -67,8 +68,8 @@ class CleanedLine(db.Model):
     ingredient = db.Column(db.String(100), nullable=False)  # the ingredient (required)
     checked = db.Column(db.Boolean, default=False)  # whether or not the item is checked off the list
     comp_list = db.Column(db.Integer, db.ForeignKey('compiled_list.id'))
-    rawline_index = db.Column(db.Integer) # the index of which ingredient it is in the raw line
-    ingredient_color = db.Column(db.String) # the class color of the ingredient of the line
+    rawline_index = db.Column(db.Integer, nullable=False)  # the index of which ingredient it is in the raw line
+    ingredient_color = db.Column(db.String, nullable=False)  # the class color of the ingredient of the line
 
     def __repr__(self):
         return f"{self.ingredient} in list {self.comp_list}"

@@ -8,29 +8,40 @@
 
 {% block content %}
     <div class="row">
-      <div class="col-md-4">
-        <h1> Recipes </h1>
-          <div id="recipe-list" class="list-group">
-              {% for recipe in recipe_list %}
-                <div role="button" class="recipe-button list-group-item">
-                    <span class="dot d-none {{recipe.hex_color}}" style="background-color:{{recipe.hex_color}}"></span>
-                    {{recipe.name}}
-                    {% if recipe.recipe_url %}
-                        <a href={{recipe.recipe_url}} target="_blank" class="source-button well">Source</a>
-                    {% endif %}
-                </div>
-              {% endfor %}
-          </div>
-          {% if user_is_owner %}
-          <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addRecipeModal"> Add Recipe </button>
-          {% endif %}
+      <div class="col-md-4 my-3">
+          <div class="recipe-panel card bg-light border-0 shadow-sm">
+          <div class="card-body">
+              <h2 class="card-title"> Recipes </h2>
+              <div id="recipe-list">
+                  {% for recipe in recipe_list %}
+                  <div class="row px-2">
+                    <div role="button" class="recipe-button card my-2 col shadow-sm">
+                        <div class="card-body mx-.5 py-3 px-1">
+                        <span class="dot d-none {{recipe.hex_color}}" style="background-color:{{recipe.hex_color}}"></span>
+                        {{recipe.name}}
+                        </div>
+                    </div>
+                      {% if recipe.recipe_url %}
+                            <a href={{recipe.recipe_url}} target="_blank" class="card col-1 my-2 mx-2 source-button">&#129109</a>
+                      {% endif %}
+                  </div>
+                  {% endfor %}
+                  {% if user_is_owner %}
+                  <div class="row px-2 py-2">
+                      <a href="{{ url_for('recipe.add_recipe', list_name=comp_list.hex_name) }}" class="btn btn-primary shadow-sm col-1 btn-large">+</a>
+                  </div>
+                      {% endif %}
+              </div>
+
+              </div>
+              </div>
       </div>
 
       <div class="col-md-8 my-3">
-          <div class="card">
+          <div class="card shadow">
               <div class="card-body">
-                <div class="card p-1 shadow title-bg">
-                  <div class="edit-label w-100 text-center" id="complist-name" contenteditable><h1>{{ comp_list.name }}</h1></div>
+                <div class="card p-1 shadow-sm title-bg{% if user_is_owner and not current_user.temporary %} title-bg-editable {%endif%}">
+                  <div class="edit-label w-100 text-center" id="complist-name" {% if user_is_owner and not current_user.temporary%} contenteditable {% endif %}><h1>{{ comp_list.name }}</h1></div>
                 </div>
           {% if current_user.temporary %}
           <div>
@@ -50,10 +61,13 @@
               {% if not user_is_owner %}
               <a href="{{url_for('checklist.copy_list', hex_name=comp_list.hex_name)}}" class="btn btn-success">Create Copy</a>
               {% endif %}
+              {% if user_is_owner %}
+              <button type="button" class="btn btn-danger float-right" data-toggle="modal" data-target="#deleteModal"> Delete List </button>
+              {% endif %}
           </div>
             <div class="list-group-root" id="compiled-list">
                 {% for line in list_lines %}
-                <div id="full-{{line.hex_id}}-{{line.ingredient_color}}" class="full-line my-3 row">
+                <div id="full-{{line.hex_id}}-{{line.ingredient_color}}" class="full-line my-3 mr-1 row">
                     <div class="col-2 col-sm-1">
                     <label id="label-{{line.hex_id}}" class="recipe-label mr-1">
                         <input id="checkbox-{{line.hex_id}}" type="checkbox"{{line.checked}}{% if not user_is_owner%}disabled{% endif %}>
@@ -86,14 +100,13 @@
                     </div>
                 </div>
                 {% endfor %}
+                {% if user_is_owner %}
+                <div>
+                    <input id="add-line-input" class="form-control" type="text" placeholder="Add Ingredient">
+                </div>
+                {% endif%}
             </div>
 
-          {% if user_is_owner %}
-            <input id="add-line-input" class="form-control" type="text">
-            <button id="add-line-submit" class="btn btn-secondary"> Add Line </button>
-
-            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteModal"> Delete </button>
-          {% endif%}
           </div>
       </div>
     </div>

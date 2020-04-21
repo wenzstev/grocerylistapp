@@ -51,6 +51,15 @@ a[data-toggle="collapse"] {
   display: inline-block;
 }
 
+.dot-selector {
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  display: inline-block;
+
+
+}
+
 @media (max-width: 768px) {
   #sidebar {
     margin-left: -250px;
@@ -312,20 +321,20 @@ a[data-toggle="collapse"] {
 
 
 .source-button {
-  float: right;
   background-color: darkgray;
   color: white;
-  padding: 3px;
-  position: relative;
-  bottom: 2px;
-  left: 10px;
-  margin: 0px;
+  height: 2em;
+  border: none;
+  text-align: center;
 }
 
 .source-button:hover{
   text-decoration: none;
   background-color: gray;
   color: white;
+}
+
+.recipe-panel{
 }
 
 .source-button:focus{
@@ -381,7 +390,6 @@ a[data-toggle="collapse"] {
   border: none;
   padding: .25rem;
   font-size: 25px;
-  cursor: pointer;
 }
 
 .edit-label:focus{
@@ -403,7 +411,11 @@ a[data-toggle="collapse"] {
   background: #fcf4e8;
 }
 
-.title-bg:hover{
+.title-bg-editable {
+  cursor: pointer;
+}
+
+.title-bg-editable:hover{
   background: #faebd7;
 }
 

@@ -23,7 +23,62 @@ function clean_line(jsonData, clean_line){
       send_line_data($(this), line_color)
 
   })
+}
 
+function delete_line(){
+  var del = confirm("Are you sure you want to delete this line?")
+  if (del==true){
+    var line_to_delete = $( this ).attr('id').slice(7, 18)
+    console.log(line_to_delete)
+    data = {"line": line_to_delete}
+    $.ajax({
+      type: 'POST',
+      url: $SCRIPT_ROOT + "/line/delete",
+      data: data,
+      dataType: 'json',
+      success: function(jsonData){
+        var deleted_line = jsonData["line"]
+        console.log("deleted " + deleted_line)
+        $("#line-" + deleted_line).parent().remove()
+
+      }
+    })
+  }
+}
+
+function get_line_data(){
+  var line = $( this )
+
+  var data = {
+    'hex_id': $( this ).attr('id')
+  }
+
+  $.ajax({
+    type: 'POST',
+    url: $SCRIPT_ROOT + '/line/get_colors',
+    data: data,
+    dataType: 'json',
+    success: function(jsonData){
+      clean_line(jsonData, line)
+      line.prop("disabled", true)
+    }
+  })
+}
+
+function cross_out_line(){
+  var selected_line = $( this ).attr('id')
+  data = {'line': selected_line.slice(9, 20)}
+
+  $.ajax({
+    type: 'POST',
+    url: $SCRIPT_ROOT + '/line/checked',
+    data: data,
+    dataType: 'json',
+    success: function(jsonData){
+      console.log('line activation set to ' + jsonData['isActive'])
+      $('#line-' + jsonData['line']).toggleClass('strikethrough')
+    }
+  })
 }
 
 $(document).ready(function(){
@@ -61,50 +116,55 @@ $(document).ready(function(){
   })
 
 
-  $("#add-line-submit").on("click", function (){
-    var new_line = $("#add-line-input").val()
-
-    var list = $('#compiled-list')
-
-    var data = {
-      'line_text': new_line,
-      'compiled_list': $LIST_HEX
+  $('.edit-label').keypress(function(event){
+    console.log(event)
+    if (event.keyCode == '13'){
+      event.preventDefault()
+      change_list_name()
+      $( this ).blur()
     }
-
-    // ajax call to parse the recipe line
-
-    $.ajax({
-      type: 'POST',
-      url: $SCRIPT_ROOT + '/line/parse_line',
-      data: data,
-      dataType: 'json',
-      success: function(jsonData){clean_line(jsonData, list)},
-    })
-
-    console.log(new_line)
-
   })
 
-  $('.recipe-info').on("click", function () {
+  $("#add-line-input").keypress(function (event){
+    if(event.keyCode == '13'){
+      var new_line = $( this ).val()
+      $( this ).val('')
 
-    var line = $( this )
+      $( this ).blur()
 
-    var data = {
-      'hex_id': $( this ).attr('id')
-    }
-
-
-    $.ajax({
-      type: 'POST',
-      url: $SCRIPT_ROOT + '/line/get_colors',
-      data: data,
-      dataType: 'json',
-      success: function(jsonData){
-        clean_line(jsonData, line)
-        line.prop("disabled", true)
+      var data = {
+        'line_text': new_line,
+        'compiled_list': $LIST_HEX
       }
-    })
+
+      // ajax call to parse the recipe line
+
+      $.ajax({
+        type: 'POST',
+        url: $SCRIPT_ROOT + '/line/parse_line',
+        data: data,
+        dataType: 'text',
+        success: function(htmlData){
+          console.log(htmlData)
+          new_line = $(htmlData)
+          new_line.find('.remove-button').on('click', delete_line)
+          new_line.find('.recipe-info').on('click', get_line_data)
+          new_line.find('input').on("change", cross_out_line)
+
+          $("#compiled-list").find('.full-line').each(function(){
+            if($(this).attr('id') == new_line.attr('id')){
+              $(this).remove() // remove an old cleaned line to make way for the new one
+            }
+          })
+
+          new_line.insertBefore("#add-line-input")
+        },
+      })
+
+    }
   })
+
+  $('.recipe-info').on("click", get_line_data)
 
   function change_list_name(){
     return change_name('list', $LIST_HEX, $(this).text())
@@ -148,43 +208,9 @@ $(document).ready(function(){
     })
   })
 
-  $('.recipe-label').find('input').on("change", function(){
-    var selected_line = $( this ).attr('id')
-    data = {'line': selected_line.slice(9, 20)}
+  $('.recipe-label').find('input').on("change", cross_out_line)
 
-    $.ajax({
-      type: 'POST',
-      url: $SCRIPT_ROOT + '/line/checked',
-      data: data,
-      dataType: 'json',
-      success: function(jsonData){
-        console.log('line activation set to ' + jsonData['isActive'])
-        $('#line-' + jsonData['line']).toggleClass('strikethrough')
-      }
-    })
-  })
-
-  $('.remove-button').on('click', function(){
-    var del = confirm("Are you sure you want to delete this line?")
-    if (del==true){
-      var line_to_delete = $( this ).attr('id').slice(7, 18)
-      console.log(line_to_delete)
-      data = {"line": line_to_delete}
-      $.ajax({
-        type: 'POST',
-        url: $SCRIPT_ROOT + "/line/delete",
-        data: data,
-        dataType: 'json',
-        success: function(jsonData){
-          var deleted_line = jsonData["line"]
-          console.log("deleted " + deleted_line)
-          $("#line-" + deleted_line).remove()
-          $("#checkbox-" + deleted_line).parent().remove()
-
-        }
-      })
-    }
-  })
+  $('.remove-button').on('click', delete_line)
 
   function handle_mousedown(e){
     e.preventDefault()  // necessary to prevent the anchor from activating

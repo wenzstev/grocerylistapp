@@ -17,8 +17,7 @@
 <h6 class="text-muted font-italic">... or type or paste lines from a recipe or individual ingredients below! </h6>
 <div class="card my-3">
     <div class="card-body">
-        <h5>Or create by typing or pasting recipe lines below:</h5>
-        <form method="POST" action="{{ url_for('checklist.create_methods', method='custom') }}">
+        <form method="POST" action="{{ url_for('checklist.create_methods', method='manual') }}">
             <fieldset>
                 {{ custom_form.recipe_lines(class='form-control')}}
             </fieldset>

@@ -22,11 +22,18 @@ def compiled_list(hex_name):
     export_to_pdf_form = ExportToPDFForm(prefix="export-pdf")
     export_to_email_form = ExportToEmailForm(prefix="email")
 
+    if current_user.is_authenticated:
+        export_to_email_form.email.data = current_user.email
+
     comp_list = CompiledList.query.filter_by(hex_name=hex_name).first_or_404()
     list_lines = CleanedLine.query.filter_by(list=comp_list).all()
     sort_list(list_lines)
 
-    user_is_owner = current_user.id == comp_list.user_id
+    if current_user.is_authenticated:
+        user_is_owner = current_user.id == comp_list.user_id
+    else:
+        user_is_owner = False
+
     creator = current_user if user_is_owner else User.query.get(comp_list.user_id)
 
     recipe_list = RecipeList.query.filter_by(complist=comp_list).all()
@@ -54,9 +61,7 @@ def compiled_list(hex_name):
     # reverse to put "additional ingredients" on bottom
     recipe_list.reverse()
 
-    grocery_lists = CompiledList.query.filter_by(user_id=current_user.id)
-
-    return render_template('list_page.html', grocery_lists=grocery_lists, comp_list=comp_list,
+    return render_template('list_page.html', comp_list=comp_list,
                            list_lines=list_lines, recipe_form=recipe_form,
                            recipe_list=recipe_list, custom_recipe_form=custom_recipe_form,
                            export_to_pdf_form=export_to_pdf_form, export_to_email_form=export_to_email_form,
@@ -174,6 +179,10 @@ def print_list(hex_name):
 
 @checklist.route('/list/<string:hex_name>/copy')
 def copy_list(hex_name):
+    if not current_user.is_authenticated:
+        flash("You need to create an account to copy this list!", "info")
+        return redirect(url_for('account.register'))
+
     list_to_copy = CompiledList.query.filter_by(hex_name=hex_name).first_or_404()
     recipes_to_copy = RecipeList.query.filter_by(complist=list_to_copy).all()
 
