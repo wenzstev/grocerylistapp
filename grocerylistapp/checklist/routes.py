@@ -52,7 +52,7 @@ def compiled_list(hex_name):
         email_list(export_to_email_form.email.data, comp_list, list_lines, recipe_list)
         flash('Email sent successfully!', 'success')
 
-        return redirect(url_for('list.compiled_list', hex_name=hex_name))
+        return redirect(url_for('checklist.compiled_list', hex_name=hex_name))
 
 
     list_lines = [CompiledIngredientLine(line) for line in list_lines]
@@ -61,11 +61,13 @@ def compiled_list(hex_name):
     # reverse to put "additional ingredients" on bottom
     recipe_list.reverse()
 
+    guest_list = comp_list if current_user.temporary else None
+
     return render_template('list_page.html', comp_list=comp_list,
                            list_lines=list_lines, recipe_form=recipe_form,
                            recipe_list=recipe_list, custom_recipe_form=custom_recipe_form,
                            export_to_pdf_form=export_to_pdf_form, export_to_email_form=export_to_email_form,
-                           user_is_owner=user_is_owner, creator=creator)
+                           user_is_owner=user_is_owner, creator=creator, guest_list=guest_list)
 
 
 @checklist.route('/list/create', methods=['GET', 'POST'])
@@ -113,6 +115,7 @@ def delete(hex_name):
     list_to_delete = CompiledList.query.filter_by(hex_name=hex_name).first_or_404()
     db.session.delete(list_to_delete)
     db.session.commit()
+    flash("List Deleted.", "info")
     return redirect(url_for('main.home'))
 
 

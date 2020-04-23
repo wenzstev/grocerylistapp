@@ -21,8 +21,13 @@
                         {{recipe.name}}
                         </div>
                     </div>
+                      {% if recipe.name != 'Additional Ingredients' %}
+                      <div class="col-1 my-2 mx-2 p-0">
                       {% if recipe.recipe_url %}
-                            <a href={{recipe.recipe_url}} target="_blank" class="card col-1 my-2 mx-2 source-button">&#129109</a>
+                            <a href={{recipe.recipe_url}} target="_blank" class="card source-button w-100 shadow-sm">&#129109</a>
+                      {% endif %}
+                          <a href="{{url_for('recipe.reset_recipe', list_name=comp_list.hex_name, recipe=recipe.hex_name)}}" class="card mt-2 p-0 w-100 edit-button shadow-sm">&#8624</a>
+                          </div>
                       {% endif %}
                   </div>
                   {% endfor %}

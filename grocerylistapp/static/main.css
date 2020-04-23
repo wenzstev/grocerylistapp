@@ -323,7 +323,7 @@ a[data-toggle="collapse"] {
 .source-button {
   background-color: darkgray;
   color: white;
-  height: 2em;
+  height: 2.2em;
   border: none;
   text-align: center;
 }
@@ -331,6 +331,20 @@ a[data-toggle="collapse"] {
 .source-button:hover{
   text-decoration: none;
   background-color: gray;
+  color: white;
+}
+
+.edit-button {
+  background-color: forestgreen;
+  color: white;
+  height: 2.2em;
+  border: none;
+  text-align: center;
+}
+
+.edit-button:hover{
+  text-decoration: none;
+  background-color: green;
   color: white;
 }
 

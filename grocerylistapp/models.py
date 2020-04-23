@@ -1,5 +1,7 @@
 import secrets
 
+from datetime import datetime
+
 from itsdangerous import TimedJSONWebSignatureSerializer as TimedSerializer
 from itsdangerous import JSONWebSignatureSerializer as Serializer
 
@@ -29,6 +31,7 @@ class RecipeList(db.Model):
 
 class CompiledList(db.Model):
     id = db.Column(db.Integer, primary_key=True)    # the primary key
+    date_created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     name = db.Column(db.String(20), nullable=False, default="Unnamed List")  # user created name, optional
     hex_name = db.Column(db.String(20), unique=True, nullable=False)  # name for database #TODO use hex_id() function
     lines = db.relationship('CleanedLine', backref='list', lazy=True)  # cleaned lines for the list
@@ -48,11 +51,10 @@ line_assocs = db.Table('line_assocs',
 class RawLine(db.Model):
     # TODO: refactor so there are less 'id' labels
     id = db.Column(db.Integer, primary_key=True)  # the primary key
-    hex_id = db.Column(db.String(8), default=get_hex_id, nullable=False, unique=True) # hex identifier for requests
+    hex_id = db.Column(db.String(8), default=get_hex_id, nullable=False, unique=True)  # hex identifier for requests
     full_text = db.Column(db.String(100), nullable=False)  # the text of the line
     list_id = db.Column(db.Integer, db.ForeignKey('recipe_list.id'))  # the id of the list for the line
     text_to_colors = db.Column(db.String)
-    #change to back_populates?
     cleaned_lines = db.relationship('CleanedLine', secondary=line_assocs, backref=db.backref('raw_lines', lazy='dynamic'))
 
     def __repr__(self):

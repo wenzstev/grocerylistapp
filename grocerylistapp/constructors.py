@@ -26,7 +26,10 @@ class CompiledIngredientLine:
         self.amount = cleaned_line.amount
         self.measurement = cleaned_line.measurement
 
-        self.ingredient_id = cleaned_line.ingredient.strip().replace(" ", "-")  # ingredient id for use in html
+        ingredient_id = cleaned_line.ingredient.replace(",", "").replace("-", "") # ingredient id for use in html
+        ingredient_id = ingredient_id.split()
+        ingredient_id = '-'.join(ingredient_id)
+        self.ingredient_id = ingredient_id
 
         self.checked = ""
         if cleaned_line.checked:
@@ -59,7 +62,7 @@ class ChecklistCard:
         self.sample_recipes = self.recipes[:num_samples]
 
         self.leftover_recipes = len(self.recipes) - len(self.sample_recipes)
-
+        self.date_created = checklist.date_created
 
 # creates a new recipe
 def create_recipe(title):
@@ -103,9 +106,11 @@ def create_recipe_from_text(title, recipe_text):
     print(recipe_lines)
 
     for num, line in enumerate(recipe_lines):  # FIXME: this code is the same as in utils.url_to_recipe
-        print(line)
-        recipe_colors = color_entities_in_line(line)
-        recipe_line = RawLine(full_text=line, rlist=recipe, text_to_colors=recipe_colors)
+        split_line = line.split()
+        rejoined_line = ' '.join(split_line)  # do this to eliminate double spaces
+        print(rejoined_line)
+        recipe_colors = color_entities_in_line(rejoined_line)
+        recipe_line = RawLine(full_text=rejoined_line, rlist=recipe, text_to_colors=recipe_colors)
         db.session.add(recipe_line)
     db.session.commit()
 

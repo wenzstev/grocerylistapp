@@ -14,8 +14,11 @@ account = Blueprint('account', __name__)
 
 @account.route('/home', methods=['GET', 'POST'])
 def user_homepage():
-    user_lists = CompiledList.query.filter_by(user_id=current_user.id)
+    if not current_user.is_authenticated:
+        return redirect(url_for('main.home'))
+    user_lists = CompiledList.query.filter_by(user_id=current_user.id).all()
     user_lists = [ChecklistCard(c, 3) for c in user_lists]
+    user_lists.reverse()
 
     url_form = RecipeURLForm(prefix='url')
 
@@ -25,6 +28,7 @@ def user_homepage():
 @account.route('/register', methods=['GET', 'POST'])
 def register():
     register_form = RegistrationForm()
+
 
     if register_form.validate_on_submit():
         print('here')
@@ -55,8 +59,8 @@ def register():
 
     if current_user.is_authenticated:
         if current_user.temporary:
-            guest_list = CompiledList.query.filter_by(user_id=current_user.id).all()
-            return render_template('register.html', register_form=register_form, grocery_lists=guest_list)
+            guest_list = CompiledList.query.filter_by(user_id=current_user.id).first()
+            return render_template('register.html', register_form=register_form, guest_list=guest_list)
         else:
             return redirect(url_for('main.home'))
 

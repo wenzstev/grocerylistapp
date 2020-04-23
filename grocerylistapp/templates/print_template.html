@@ -35,7 +35,7 @@
                 {% if print_lines == "y" %}
                     <ul>
                         {% for raw_line in line.raw_lines %}
-                            <li>{{raw_line.full_text}} <span style="font-style: italic">{{raw_line.recipe.name}}</span></li>
+                            <li>"{{raw_line.full_text}}" -- <span style="font-style: italic">{{raw_line.recipe.name}}</span></li>
                         {% endfor %}
                     </ul>
                 {% endif %}

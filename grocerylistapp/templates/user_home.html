@@ -24,6 +24,9 @@
                     <p class="card-text font-italic text-muted">...and {{list.leftover_recipes}} more. </p>
                 {% endif %}
             </div>
+            <div class="card-footer p-1">
+                <small class="font-italic float-right text-muted">Created on {{list.date_created.month}}/{{list.date_created.day}}/{{list.date_created.year}}</small>
+            </div>
         </div>
     {% if loop.index % 2 == 0 %}
         <div class="w-100 d-none d-sm-block d-md-none"><!-- wrap every 2 on small --></div>
@@ -42,3 +45,7 @@
 </div>
 
 {% endblock content %}
+
+{% block scripts %}
+<script src="{{url_for('static', filename='user_page_functions.js')}}"></script>
+{% endblock scripts %}

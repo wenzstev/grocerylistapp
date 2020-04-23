@@ -140,7 +140,7 @@ def parse_line():
     print('index will be ', cur_list_num)
 
     # check if we entered a duplicate ingredient
-    cline_to_render = CleanedLine.query.filter_by(ingredient=new_line + ' ', list=cur_list).first()
+    cline_to_render = CleanedLine.query.filter_by(ingredient=new_line, list=cur_list).first()
     print(cline_to_render)
     if cline_to_render:
         print("cline exists")

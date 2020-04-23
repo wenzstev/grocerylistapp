@@ -98,8 +98,26 @@ def clean_recipe(list_name, new_recipe):
 
     grocery_lists = CompiledList.query.filter_by(user_id=current_user.id)
 
-    return render_template('add_recipe.html', title="Adding Recipe", rlist=rlist, rlist_lines=rlist_lines, grocery_lists=grocery_lists)
+    guest_list = CompiledList.query.filter_by(hex_name=list_name).first() if current_user.temporary else None
 
+    return render_template('add_recipe.html', title="Adding Recipe", rlist=rlist, rlist_lines=rlist_lines, guest_list=guest_list)
+
+
+@recipe.route('/list/<string:list_name>/reset_recipe/<string:recipe>')
+def reset_recipe(list_name, recipe):
+    # decouples recipe from clines to make edits
+    recipe_to_reset = RecipeList.query.filter_by(hex_name=recipe).first_or_404()
+
+    for recipe_line in recipe_to_reset.lines:
+        print(recipe_line)
+        for cline in recipe_line.cleaned_lines:
+            if len(cline.raw_lines.all()) == 1:
+                db.session.delete(cline)
+        recipe_line.cleaned_lines = []
+
+    db.session.commit()
+
+    return redirect(url_for('recipe.clean_recipe', list_name=list_name, new_recipe=recipe))
 
 
 @recipe.route('/recipe/rename', methods=['POST'])

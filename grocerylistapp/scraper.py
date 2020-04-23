@@ -25,6 +25,10 @@ ingredient_parsers = {
     "www.yummly.com": {
         "title": ("h1", "class", "recipe-title"),
         "lines": ("li", "class", "IngredientLine")
+    },
+    "www.epicurious.com": {
+        "title": ("h1", "itemprop", "name"),
+        "lines": ("li", "class", "ingredient")
     }
 }
 
@@ -42,7 +46,12 @@ def get_recipe_info(url):
         print("found for ", parsing_information)
         # get information for the title
         component, attribute, name = parsing_information["title"]
-        recipe_title = soup.find(component, {attribute: name}).get_text()
+        print(component, attribute, name)
+
+        try:
+            recipe_title = soup.find(component, {attribute: name}).get_text()
+        except AttributeError:
+            recipe_title = ""
 
         # get information for the lines
         component, attribute, name = parsing_information["lines"]
