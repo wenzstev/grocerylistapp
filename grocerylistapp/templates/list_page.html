@@ -61,7 +61,6 @@
           </div>
           {% endif %}
           <div class="my-2" id="list-tool-panel">
-              <button data-toggle="modal" data-target="#printModal" class="btn btn-info">Print</button>
               <button data-toggle="modal" data-target="#exportModal" class="btn btn-info">Email</button>
               {% if not user_is_owner %}
               <a href="{{url_for('checklist.copy_list', hex_name=comp_list.hex_name)}}" class="btn btn-success">Create Copy</a>
@@ -231,10 +230,10 @@
             <div class="modal-body">
                 <form method="POST" action="">
                     {{export_to_email_form.hidden_tag()}}
-                    <fieldset>
+                    <div class="form-group">
                         {{export_to_email_form.email.label}}
                         {{export_to_email_form.email(class='form-control')}}
-                    </fieldset>
+                    </div>
                     {{export_to_email_form.submit(class='btn btn-primary')}}
                 </form>
             </div>

@@ -22,7 +22,7 @@ def compiled_list(hex_name):
     export_to_pdf_form = ExportToPDFForm(prefix="export-pdf")
     export_to_email_form = ExportToEmailForm(prefix="email")
 
-    if current_user.is_authenticated:
+    if current_user.is_authenticated and not current_user.temporary:
         export_to_email_form.email.data = current_user.email
 
     comp_list = CompiledList.query.filter_by(hex_name=hex_name).first_or_404()
