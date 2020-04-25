@@ -129,4 +129,5 @@ dmypy.json
 # additional
 Scripts
 grocerylistapp/site.db
+grocerylistapp/config.py
 /run.py

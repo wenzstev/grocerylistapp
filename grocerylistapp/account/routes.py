@@ -16,6 +16,9 @@ account = Blueprint('account', __name__)
 def user_homepage():
     if not current_user.is_authenticated:
         return redirect(url_for('main.home'))
+    if current_user.temporary:
+        guest_list = CompiledList.query.filter_by(user_id=current_user.id).first()
+        return redirect(url_for('checklist.compiled_list', hex_name=guest_list.hex_name))
     user_lists = CompiledList.query.filter_by(user_id=current_user.id).all()
     user_lists = [ChecklistCard(c, 3) for c in user_lists]
     user_lists.reverse()

@@ -21,6 +21,7 @@ def add_recipe(list_name):
     custom_form = CustomRecipeForm(prefix='recipe-custom')
 
     if url_form.validate_on_submit():
+
         new_recipe = create_recipe_from_url(url_form.url.data)
         return redirect(url_for('recipe.clean_recipe', list_name=list_name, new_recipe=new_recipe.hex_name))
 
@@ -98,9 +99,7 @@ def clean_recipe(list_name, new_recipe):
 
     grocery_lists = CompiledList.query.filter_by(user_id=current_user.id)
 
-    guest_list = CompiledList.query.filter_by(hex_name=list_name).first() if current_user.temporary else None
-
-    return render_template('add_recipe.html', title="Adding Recipe", rlist=rlist, rlist_lines=rlist_lines, guest_list=guest_list)
+    return render_template('add_recipe.html', title="Adding Recipe", rlist=rlist, rlist_lines=rlist_lines)
 
 
 @recipe.route('/list/<string:list_name>/reset_recipe/<string:recipe>')

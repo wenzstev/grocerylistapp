@@ -75,7 +75,7 @@ def color_entities_in_line(line, line_colors=line_colors):
         print(token.ent_iob_)
         if token.ent_type_ == "INGREDIENT":
             if token.ent_iob_ == "B":
-                cur_ingredient += 1 if cur_ingredient < 3 else 0
+                cur_ingredient += 1 if cur_ingredient < 2 else 0
             color_tuples.append((token.text,  "btn-ingredient " + line_ingredients[cur_ingredient]))
         else:
             color_tuples.append((token.text, line_colors["O"]))

@@ -4,6 +4,12 @@ from urllib.parse import urlparse
 
 from bs4 import BeautifulSoup
 
+# repeated attributes for sites using WordPress Recipe maker
+wprm_scrapers = {
+    "title": ("h2", "class", "wprm-recipe-name"),
+    "lines": ("li", "class", "wprm-recipe-ingredient")
+}
+
 # dictionary that stores the specifications for scraping various websites
 ingredient_parsers = {
     "www.allrecipes.com": {
@@ -18,10 +24,6 @@ ingredient_parsers = {
         "title": ("div", "class", "recipe-title"),
         "lines": ("div", "class", "recipe-ingredients__ingredient")
     },
-    "www.thekitchn.com": {
-        "title": ("h2", "class", "Recipe__title"),
-        "lines": ("li", "class", "Recipe__ingredient")
-    },
     "www.yummly.com": {
         "title": ("h1", "class", "recipe-title"),
         "lines": ("li", "class", "IngredientLine")
@@ -29,11 +31,85 @@ ingredient_parsers = {
     "www.epicurious.com": {
         "title": ("h1", "itemprop", "name"),
         "lines": ("li", "class", "ingredient")
+    },
+    "www.seriouseats.com": {
+        "title": ("h1", "class", "recipe-title"),
+        "lines": ("li", "class", "ingredient")
+    },
+    "smittenkitchen.com": {
+        "title": ("h3", "class", "jetpack-recipe-title"),
+        "lines": ("li", "class", "ingredient")
+    },
+    "www.simplyrecipes.com": {
+        "title": ("h1", "class", "entry-title"),
+        "lines": ("li", "class", "ingredient")
+    },
+    "minimalistbaker.com": wprm_scrapers,
+    "www.budgetbytes.com": wprm_scrapers
+
+}
+
+
+# these are websites that need a more sophisticated way to scrape the recipe
+def get_recipe_food52(soup):
+    print("getting from food52")
+    ingredient_div = soup.find("div", {"class": "recipe__list"})
+    ingredient_list = ingredient_div.find("ul")
+    ingredient_items = ingredient_list.find_all("li")
+
+    ingredient_lines = []
+
+    for line in ingredient_items:
+        line = line.text.replace("\n", " ")
+        s_line = line.split()
+        line = " ".join(s_line)
+        ingredient_lines.append(line)
+
+    try:
+        title = soup.find("h1", {"class": "recipe__title"}).get_text()
+    except AttributeError:
+        title = soup.title.get_text()
+
+    return {
+        "title": title,
+        "recipe_lines": ingredient_lines
     }
+
+
+# function for scraping websites that use the TastyRecipes plugin
+def get_recipe_tastyrecipes(soup):
+    ingredient_div = soup.find("div", {"class": "tasty-recipe-ingredients"})
+    ingredient_lines = ingredient_div.find_all("li")
+    recipe_lines = []
+    for line in ingredient_lines:
+        recipe_lines.append(line.text)
+        print(line.text)
+
+    recipe_title_div = soup.find("div", {"class": "tasty-recipes"})
+    recipe_title = recipe_title_div.find("h2")
+
+    return {
+        "title": recipe_title.text,
+        "recipe_lines": recipe_lines
+    }
+
+
+def get_recipe_sallysbakingaddiction(soup):
+    # 403 error
+    pass
+
+
+ingredient_functions = {
+    "food52.com": get_recipe_food52,
+    "cookieandkate.com": get_recipe_tastyrecipes,
 }
 
 def get_recipe_info(url):
     res = requests.get(url)
+    if res.status_code != 200:
+        # didn't get the recipe properly
+        return {"error": res.status_code}
+
     soup = BeautifulSoup(res.text)
 
     o = urlparse(url)
@@ -51,19 +127,26 @@ def get_recipe_info(url):
         try:
             recipe_title = soup.find(component, {attribute: name}).get_text()
         except AttributeError:
-            recipe_title = ""
+            recipe_title = soup.title.get_text()  # we get some kind of name if we can't parse the actual recipe
 
         # get information for the lines
         component, attribute, name = parsing_information["lines"]
         ingredients = soup.find_all(component, {attribute: name})
         ingredient_lines = [line.get_text() for line in ingredients]
 
-        return {
-            "title": recipe_title,
-            "recipe_lines": ingredient_lines
-        }
+    elif o.netloc in ingredient_functions:
+        print("found in ingredient functions")
+        return ingredient_functions[o.netloc](soup)
 
-    return None
+    else:
+        # the user's recipe isn't recognized
+        recipe_title = soup.title.get_text()
+        ingredient_lines = []
+
+    return {
+        "title": recipe_title,
+        "recipe_lines": ingredient_lines
+    }
 
 
 def get_recipe_allrecipes(soup):
