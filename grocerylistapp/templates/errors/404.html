@@ -1,0 +1,11 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="card my-4">
+    <div class="card-body">
+        <h1>404: Page not found.</h1>
+        <p>Sorry, the page you're looking for does not exist. </p>
+        <p><a href="{{url_for('main.home')}}">Return to your homepage</a></p>
+    </div>
+</div>
+{% endblock content %}

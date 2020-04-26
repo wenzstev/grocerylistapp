@@ -68,3 +68,7 @@ class ChangePasswordForm(FlaskForm):
     new_password = PasswordField('New Password', validators=PasswordValidators)
     new_password_confirm = PasswordField('Confirm New Password', validators=[DataRequired(), EqualTo('new_password')])
     submit = SubmitField('Change Password')
+
+
+class DeleteTemporaryForm(FlaskForm):
+    submit = SubmitField('Delete Temporary Users')

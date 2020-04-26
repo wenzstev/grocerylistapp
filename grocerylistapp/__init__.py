@@ -30,10 +30,12 @@ def create_app(config_class=Config):
     from grocerylistapp.line.routes import line
     from grocerylistapp.recipe.routes import recipe
     from grocerylistapp.account.routes import account
+    from grocerylistapp.errors.handlers import errors
     app.register_blueprint(main)
     app.register_blueprint(checklist)
     app.register_blueprint(line)
     app.register_blueprint(recipe)
     app.register_blueprint(account)
+    app.register_blueprint(errors)
 
     return app

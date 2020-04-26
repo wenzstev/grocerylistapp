@@ -1,0 +1,27 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+
+{% for user in all_users %}
+<div class="card my-2">
+    <div class="card-body">
+        {{ user.username }}
+    </div>
+</div>
+<div class="row mx-2">
+    {% for list in user.checklists %}
+    <div class="card my-1 mx-2 bg-light col-sm-3">
+        <div class="card-body">
+            {{ list.name }}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endfor %}
+
+<form method="POST" action="">
+    {{ delete_form.hidden_tag() }}
+    {{ delete_form.submit(class='btn btn-danger') }}
+</form>
+
+{% endblock content %}

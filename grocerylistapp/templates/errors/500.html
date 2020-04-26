@@ -1,0 +1,13 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="card my-4">
+    <div class="card-body">
+        <h1>500: Internal Server Error</h1>
+        <p>We're experiencing some technical difficulties at the moment. This could be because we're overwhelmed with traffic, or because of
+        something going wrong on our end. If our servers are overwhelmed, wait a few minutes and try again. Otherwise,
+        you can <a href="{{url_for('main.home')}}">return to your homepage.</a> and try something else.</p>
+
+    </div>
+</div>
+{% endblock content %}

@@ -1,4 +1,6 @@
-from flask import Blueprint, render_template, flash, redirect, url_for
+import os
+
+from flask import Blueprint, render_template, flash, redirect, url_for, abort
 from flask_login import current_user, login_user, logout_user, login_required
 from sqlalchemy import exc
 from grocerylistapp import bcrypt, db
@@ -6,7 +8,8 @@ from grocerylistapp.models import User, CompiledList
 from grocerylistapp.forms import RecipeURLForm, CustomRecipeForm
 from grocerylistapp.constructors import ChecklistCard
 
-from grocerylistapp.account.forms import RegistrationForm, LoginForm, EditForm, ResetRequestForm, ResetPasswordForm, ChangePasswordForm
+from grocerylistapp.account.forms import RegistrationForm, LoginForm, EditForm, ResetRequestForm, ResetPasswordForm, \
+    ChangePasswordForm, DeleteTemporaryForm
 from grocerylistapp.account.utils import send_reset_email, send_validate_email
 
 account = Blueprint('account', __name__)
@@ -31,7 +34,6 @@ def user_homepage():
 @account.route('/register', methods=['GET', 'POST'])
 def register():
     register_form = RegistrationForm()
-
 
     if register_form.validate_on_submit():
         print('here')
@@ -58,7 +60,6 @@ def register():
             return render_template('register.html', register_form=register_form)
 
         return redirect(url_for('account.login'))
-
 
     if current_user.is_authenticated:
         if current_user.temporary:
@@ -134,7 +135,6 @@ def settings():
             flash('The password you entered does not match our records.', 'danger')
             return redirect(url_for('account.settings'))
 
-
     edit_form.username.data = current_user.username
     edit_form.email.data = current_user.email
 
@@ -191,3 +191,38 @@ def verify_email(token):
     db.session.commit()
     flash(f'The email account {user.email} has been validated!', 'success')
     return redirect(url_for('main.home'))
+
+
+@account.route("/controlpanel", methods=['GET', 'POST'])
+def control_panel():
+    if not current_user.is_authenticated:
+        abort(403)
+
+    if current_user.username != os.environ.get('ADMIN_USERNAME'):
+        abort(403)
+
+    all_users = User.query.all()
+
+    delete_form = DeleteTemporaryForm(prefix="delete-temporary")
+    if delete_form.validate_on_submit():
+        for user in all_users:
+            if user.temporary:
+                for list in user.checklists:
+                    for cline in list.lines:
+                        db.session.delete(cline)
+                    for recipe in list.recipes:
+                        for raw_line in recipe.lines:
+                            db.session.delete(raw_line)
+                        db.session.delete(recipe)
+                    db.session.delete(list)
+                db.session.delete(user)
+        db.session.commit()
+        flash('Temporary users deleted.', 'success')
+        return redirect(url_for('account.control_panel'))
+
+
+    return render_template("control_panel.html", all_users=all_users, delete_form=delete_form)
+
+
+
+
