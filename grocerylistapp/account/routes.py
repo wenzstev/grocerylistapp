@@ -36,7 +36,6 @@ def register():
     register_form = RegistrationForm()
 
     if register_form.validate_on_submit():
-        print('here')
         hashed_password = bcrypt.generate_password_hash(register_form.password.data).decode('utf-8')
         if not current_user.is_authenticated:
             user = User(username=register_form.username.data, email=register_form.email.data, password=hashed_password)
@@ -50,7 +49,7 @@ def register():
 
         try:
             db.session.commit()
-            flash("Account created successfully!", "success")
+            flash("Account created successfully! Please validate your email to sign in.", "success")
             send_validate_email(user)
         except exc.IntegrityError as error:
             db.session.rollback()
@@ -80,9 +79,15 @@ def login():
     if login_form.validate_on_submit():
         user = User.query.filter_by(username=login_form.username.data).first()
         if user and bcrypt.check_password_hash(user.password, login_form.password.data):
-            login_user(user)
-            flash('You are now logged in!', 'success')
-            return redirect(url_for('main.home'))
+            # verify that the user's email is verified
+            if user.email_validated:
+                login_user(user)
+                flash('You are now logged in!', 'success')
+                return redirect(url_for('main.home'))
+            else:
+                flash('You need to validate your email before you can log in.', 'danger')
+                return redirect(url_for('account.login'))
+
         else:
             flash('Login unsuccessful. Please check username and password.', 'danger')
 
